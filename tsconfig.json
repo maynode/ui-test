@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "ESNext.Disposable"],
+    "types": ["node"],
+    "strict": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,                             /*This is for "path" module import*/
+    "paths": {                                           /* Specify a set of entries that re-map imports to additional lookup locations. */
+      "@pages/*":["./pageFactory/pageRepository/*"],
+      "@objects/*":["./pageFactory/objectRepository/*"],
+      "@lib/*":["./lib/*"],
+    }                             
+  }
+}
