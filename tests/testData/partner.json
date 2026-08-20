@@ -1,0 +1,10 @@
+{
+  "description": "伙伴认证模块测试数据",
+  "partnerCert": {
+    "url": "/partnerCert",
+    "containerSelector": ".partner-cert-page",
+    "exclusiveLabel": "伙伴专属",
+    "courseItemSelector": ".partner-cert-course .course-item",
+    "tabsSelector": ".partner-core-tabs"
+  }
+}

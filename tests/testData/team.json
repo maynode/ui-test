@@ -1,0 +1,26 @@
+{
+  "description": "团队管理相关测试数据，用于团队管理主流程测试",
+  "myTeam": {
+    "url": "/user/myTeam",
+    "containerSelector": ".my-team-container",
+    "serviceRecordTab": "服务记录",
+    "permissionTab": "权限管理",
+    "serviceRecordSelector": ".service-record",
+    "memberRowSelector": ".member-row",
+    "permissionSelectSelector": ".permission-select",
+    "saveBtn": "保存",
+    "successToastSelector": ".success-toast",
+    "unregisteredRowSelector": ".member-row.unregistered"
+  },
+  "ncre": {
+    "url": "/ncre",
+    "containerSelector": ".ncre-container"
+  },
+  "partnerCert": {
+    "url": "/partnerCert",
+    "containerSelector": ".partner-cert-container",
+    "courseCardSelector": ".course-card",
+    "partnerExclusiveSelector": ".partner-exclusive",
+    "courseTitleSelector": ".course-title"
+  }
+}

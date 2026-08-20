@@ -1,7 +1,6 @@
 # Name of the GitHub Actions workflow
 name: Playwright Github Actions
 
-# Define when to trigger this workflow
 on:
   push:
     branches:
@@ -10,50 +9,43 @@ on:
     branches:
       - main
 
-# Define the jobs to run in this workflow
 jobs:
-  # Define a job named 'build'
-  build:
-    # Specify the operating system for this job
+  demoqa-smoke:
     runs-on: ubuntu-latest
     env:
-      SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-    # Define the steps to execute in this job
     steps:
-      # Step to checkout the source code from the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step to set up the Node.js version
-      - name: Install node js v20
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Install node js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "pnpm"
 
-      # Step to install Node.js dependencies
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
-      # Step to install Chrome browser for Playwright
       - name: Install Chrome browser for Playwright
-        run: npx playwright install chrome
+        run: pnpm exec playwright install chrome
 
-      # Step to run tests with qa as environment variable similarly we can define qa|dev|qaApi|devApi
-      - name: Run tests
-        run: npm run test:serial:ci
+      - name: Run demoqa smoke tests
+        run: pnpm run test:serial:ci
         env:
           ENV: "qa"
           CI: true
 
-      # Step to wait for the job to complete
       - name: Wait for job completion
-        # Adjust the wait time as needed
         run: sleep 10s
-        # This step should always run, even if previous steps fail
         if: always()
 
-      # Check if HTML report exists
       - name: Check if HTML report exists
         run: |
           if [ -d "html-report" ]; then
@@ -64,33 +56,78 @@ jobs:
           fi
         if: always()
 
-      # Step to zip html-report folder
       - name: Zip HTML report
-        run: zip -r html-report.zip html-report
-        # This step should always run, even if previous steps fail
+        run: zip -r html-report-demoqa.zip html-report
         if: always()
 
-      # Step to upload artifact
-      - name: Upload artifact
+      - name: Upload demoqa artifact
         uses: actions/upload-artifact@v4
         with:
-          name: html-report
-          path: html-report.zip
+          name: html-report-demoqa
+          path: html-report-demoqa.zip
           if-no-files-found: error
         if: always()
 
-      # Step to generate artifact link
       - name: Generate artifact link
         id: artifact_link
         run: echo "artifact_url=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
         if: always()
 
-      # Send Slack notification with html-reprt url once the tests are completed
       - name: Send Slack notification
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_CHANNEL: "#playwright-test-reports"
           SLACK_USERNAME: Playwright GitHub Actions
-          SLACK_MESSAGE: "Test results are available in [Artifacts section](${{ steps.artifact_link.outputs.artifact_url }}) as html-report."
+          SLACK_MESSAGE: "Demoqa smoke results: [Artifacts](${{ steps.artifact_link.outputs.artifact_url }})"
+        if: always()
+
+  tc-platform-smoke:
+    runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Install node js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chrome browser for Playwright
+        run: pnpm exec playwright install chrome
+
+      - name: Run tc-platform smoke tests
+        run: pnpm run test:tc-platform:ci
+        env:
+          ENV: "tcQa"
+          CI: true
+          TC_USER_USERNAME: ${{ secrets.TC_USER_USERNAME }}
+          TC_USER_PASSWORD: ${{ secrets.TC_USER_PASSWORD }}
+          TC_ADMIN_USERNAME: ${{ secrets.TC_ADMIN_USERNAME }}
+          TC_ADMIN_PASSWORD: ${{ secrets.TC_ADMIN_PASSWORD }}
+          TC_PARTNER_USERNAME: ${{ secrets.TC_PARTNER_USERNAME }}
+          TC_PARTNER_PASSWORD: ${{ secrets.TC_PARTNER_PASSWORD }}
+
+      - name: Zip HTML report
+        run: zip -r html-report-tc-platform.zip html-report
+        if: always()
+
+      - name: Upload tc-platform artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report-tc-platform
+          path: html-report-tc-platform.zip
+          if-no-files-found: error
         if: always()

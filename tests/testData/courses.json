@@ -1,0 +1,15 @@
+{
+  "description": "课程相关测试数据",
+  "courseList": {
+    "url": "/course/list",
+    "containerSelector": ".course-list-content"
+  },
+  "firstCourse": {
+    "comment": "测试环境课程 ID，留空则使用 /course 默认课程",
+    "id": "",
+    "url": "/course",
+    "detailContainer": ".course-detail-page",
+    "studyContainer": ".zw-course-study",
+    "ctaButton": "开始学习|继续学习"
+  }
+}

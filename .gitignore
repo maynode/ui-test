@@ -6,3 +6,5 @@ Downloads/
 html-report.zip/
 logs/
 html-report/
+.auth/
+accounts.local.json

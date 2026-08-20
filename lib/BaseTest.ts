@@ -4,6 +4,15 @@ import { ElementsPage } from '@pages/ElementsPage';
 import { AlertsFrameWindowsPage } from '@pages/AlertsFrameWindowsPage';
 import { WidgetsPage } from '@pages/WidgetsPage';
 import { InteractionsPage } from '@pages/InteractionsPage';
+import { CourseListPage } from '@pages/CourseListPage';
+import { CourseDetailPage } from '@pages/CourseDetailPage';
+import { CertDetailPage } from '@pages/CertDetailPage';
+import { ExamPage } from '@pages/ExamPage';
+import { MyExamPage } from '@pages/MyExamPage';
+import { MyCertPage } from '@pages/MyCertPage';
+import { MyTeamPage } from '@pages/MyTeamPage';
+import { NcrePage } from '@pages/NcrePage';
+import { PartnerCertPage } from '@pages/PartnerCertPage';
 import { WebActions } from '@lib/WebActions';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -14,6 +23,15 @@ const test = baseTest.extend<{
     alertsFrameWindowsPage: AlertsFrameWindowsPage;
     widgetsPage: WidgetsPage;
     interactionsPage: InteractionsPage;
+    courseListPage: CourseListPage;
+    courseDetailPage: CourseDetailPage;
+    certDetailPage: CertDetailPage;
+    examPage: ExamPage;
+    myExamPage: MyExamPage;
+    myCertPage: MyCertPage;
+    myTeamPage: MyTeamPage;
+    ncrePage: NcrePage;
+    partnerCertPage: PartnerCertPage;
     makeAxeBuilder: AxeBuilder;
     testInfo: TestInfo;
 }>({
@@ -34,6 +52,33 @@ const test = baseTest.extend<{
     },
     interactionsPage: async ({ page, context }, use) => {
         await use(new InteractionsPage(page, context));
+    },
+    courseListPage: async ({ page }, use) => {
+        await use(new CourseListPage(page));
+    },
+    courseDetailPage: async ({ page }, use) => {
+        await use(new CourseDetailPage(page));
+    },
+    certDetailPage: async ({ page }, use) => {
+        await use(new CertDetailPage(page));
+    },
+    examPage: async ({ page }, use) => {
+        await use(new ExamPage(page));
+    },
+    myExamPage: async ({ page }, use) => {
+        await use(new MyExamPage(page));
+    },
+    myCertPage: async ({ page }, use) => {
+        await use(new MyCertPage(page));
+    },
+    myTeamPage: async ({ page }, use) => {
+        await use(new MyTeamPage(page));
+    },
+    ncrePage: async ({ page }, use) => {
+        await use(new NcrePage(page));
+    },
+    partnerCertPage: async ({ page }, use) => {
+        await use(new PartnerCertPage(page));
     },
     makeAxeBuilder: async ({ page }, use) => {
         await use(new AxeBuilder({ page })

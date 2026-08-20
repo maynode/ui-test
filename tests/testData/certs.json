@@ -1,0 +1,34 @@
+{
+  "description": "认证考试相关测试数据",
+  "certList": {
+    "url": "/cert/list"
+  },
+  "firstCert": {
+    "comment": "测试环境认证 certId，必填后才能跑认证详情/考试用例",
+    "id": "",
+    "detailUrl": "/cert/detail",
+    "titleSelector": ".cert-banner__title",
+    "learnStep": "认证学习",
+    "examStep": "在线考试",
+    "selfTestBtn": "进入模拟测试",
+    "enterExamBtn": "进入正式考试",
+    "prepareWizard": ".cert-exam-prepare-wizard",
+    "startExamBtn": "开始考试",
+    "examContainer": ".exam-answer",
+    "submitBtn": "交卷",
+    "confirmSubmitBtn": "确认交卷",
+    "submitSuccessText": "已完成交卷"
+  },
+  "myExam": {
+    "url": "/user/myExam",
+    "containerSelector": ".my-exam",
+    "tableSelector": ".my-exam .el-table",
+    "emptyText": "暂无考试信息"
+  },
+  "myCert": {
+    "url": "/user/myCert",
+    "containerSelector": ".my-cert",
+    "certItemSelector": ".cert-img",
+    "emptyText": "暂无证书信息"
+  }
+}

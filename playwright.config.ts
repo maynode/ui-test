@@ -1,14 +1,16 @@
+import fs from 'fs';
 import { PlaywrightTestConfig, devices } from '@playwright/test';
+import { getAuthStatePath } from './lib/TcAuth';
 import { testConfig } from './testConfig';
-import { OrtoniReportConfig } from 'ortoni-report';
+// import { OrtoniReportConfig } from 'ortoni-report';
 
 const ENV = process.env.ENV || process.env.npm_config_ENV; // Support both modern and legacy patterns
 const isCI = !!process.env.CI; // Detect if running in CI environment
-const validEnvironments = [`qa`, `dev`, `qaApi`, `devApi`] as const;
+const validEnvironments = [`qa`, `dev`, `qaApi`, `devApi`, `tcQa`, `tcDev`, `tcGray`] as const;
 type TestEnvironment = typeof validEnvironments[number];
 
 if (!ENV || !validEnvironments.includes(ENV as TestEnvironment)) {
-  console.log(`Please provide a correct environment value after command like "--ENV=qa|dev|qaApi|devApi"`);
+  console.log(`Please provide a correct environment value after command like "--ENV=qa|dev|qaApi|devApi|tcQa|tcDev|tcGray"`);
   process.exit();
 }
 
@@ -18,17 +20,21 @@ const ignoreHTTPSErrorsByEnvironment: Record<TestEnvironment, boolean> = {
   dev: true,
   qaApi: true,
   devApi: true,
+  tcQa: true,
+  tcDev: true,
+  tcGray: true,
 };
 const ignoreHTTPSErrors = ignoreHTTPSErrorsByEnvironment[currentEnvironment];
+const tcUserAuthState = fs.existsSync(getAuthStatePath('user')) ? getAuthStatePath('user') : undefined;
 
-const reportConfig: OrtoniReportConfig = {
-  base64Image: true,
-  title: "Playwright Framework with Typescript",
-  filename: "OrtoniHtmlReport",
-  authorName: "Akshay Pai",
-  folderPath: "html-report",
-  projectName: "Playwright Framework with Typescript",
-}
+// const reportConfig: OrtoniReportConfig = {
+//   base64Image: true,
+//   title: "Playwright Framework with Typescript",
+//   filename: "OrtoniHtmlReport",
+//   authorName: "Akshay Pai",
+//   folderPath: "html-report",
+//   projectName: "Playwright Framework with Typescript",
+// }
 
 const config: PlaywrightTestConfig = {
 
@@ -42,9 +48,11 @@ const config: PlaywrightTestConfig = {
   retries: 0,
 
   //Reporters
-  reporter: isCI 
+    reporter: isCI 
     ? [[`./CustomReporterConfig.ts`], [`allure-playwright`], [`html`, { outputFolder: 'html-report', open: 'never' }]]
-    : [[`./CustomReporterConfig.ts`], [`allure-playwright`], [`html`, { outputFolder: 'html-report', open: 'never' }],['ortoni-report', reportConfig]],
+    : [[`./CustomReporterConfig.ts`], [`allure-playwright`], [`html`, { outputFolder: 'html-report', open: 'never' }]],
+    // ortoni-report disabled on Windows until sqlite3 native bindings are available
+    // : [[`./CustomReporterConfig.ts`], [`allure-playwright`], [`html`, { outputFolder: 'html-report', open: 'never' }],['ortoni-report', reportConfig]],
 
   projects: [
     {
@@ -165,6 +173,26 @@ const config: PlaywrightTestConfig = {
         screenshot: `only-on-failure`,
         video: `retain-on-failure`,
         trace: `retain-on-failure`,
+        launchOptions: {
+          slowMo: 0
+        }
+      },
+    },
+    {
+      name: `TC-Platform`,
+      testDir: `./tests/tc-platform`,
+      use: {
+        browserName: `chromium`,
+        channel: `chrome`,
+        baseURL: testConfig[currentEnvironment],
+        headless: isCI,
+        viewport: { width: 1500, height: 730 },
+        ignoreHTTPSErrors,
+        acceptDownloads: true,
+        screenshot: `only-on-failure`,
+        video: `retain-on-failure`,
+        trace: `retain-on-failure`,
+        ...(tcUserAuthState ? { storageState: tcUserAuthState } : {}),
         launchOptions: {
           slowMo: 0
         }

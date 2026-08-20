@@ -1,0 +1,13 @@
+{
+  "description": "NCRE 模块测试数据",
+  "ncreExam": {
+    "url": "/ncreExam",
+    "containerSelector": ".ncre-pro-page",
+    "studentPanelSelector": ".ncre-pro-main",
+    "studentTab": "考生"
+  },
+  "ncreAuthCode": {
+    "url": "/ncre",
+    "containerSelector": ".main-page"
+  }
+}

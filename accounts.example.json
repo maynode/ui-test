@@ -1,0 +1,14 @@
+{
+  "user": {
+    "username": "your-user-phone-or-email",
+    "password": "your-password"
+  },
+  "admin": {
+    "username": "your-admin-phone-or-email",
+    "password": "your-password"
+  },
+  "partner": {
+    "username": "your-partner-phone-or-email",
+    "password": "your-password"
+  }
+}

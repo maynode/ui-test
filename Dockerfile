@@ -4,17 +4,17 @@ FROM node:20.5.1-bookworm-slim
 # Set the working directory inside the container to /app
 WORKDIR /app
 
-# Copy package.json and package-lock.json from the host to the container's working directory
-COPY package.json package-lock.json ./
+# Copy package.json and pnpm lockfile from the host to the container's working directory
+COPY package.json pnpm-lock.yaml ./
 
-# Install Node.js dependencies using npm ci (clean install)
-RUN npm ci
+# Enable pnpm and install dependencies
+RUN corepack enable && pnpm install --frozen-lockfile
 
 # Copy the application code from the host to the container's working directory
 COPY . .
 
 # Install Chrome browser for use with Playwright
-RUN npx playwright install chrome
+RUN pnpm exec playwright install chrome
 
-# Here, we run the test script defined in package.json (npm run test:serial)
-CMD ["npm", "run", "test:serial"]
+# Here, we run the test script defined in package.json (pnpm run test:serial)
+CMD ["pnpm", "run", "test:serial"]
