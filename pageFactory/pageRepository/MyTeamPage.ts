@@ -15,6 +15,8 @@ export class MyTeamPage {
     readonly emptyState: Locator;
     readonly openTeamCourseBtn: Locator;
     readonly openTeamCertBtn: Locator;
+    readonly collapseTables: Locator;
+    readonly firstCollapseItemHead: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -26,6 +28,8 @@ export class MyTeamPage {
         this.emptyState = page.locator('.my-team-empty');
         this.openTeamCourseBtn = page.getByRole('button', { name: '开通团队课程订阅' });
         this.openTeamCertBtn = page.getByRole('button', { name: '开通团队认证考试' });
+        this.collapseTables = page.locator('.my-team-collapse-table');
+        this.firstCollapseItemHead = page.locator('.my-team-collapse-item-head').first();
     }
 
     async goto() {

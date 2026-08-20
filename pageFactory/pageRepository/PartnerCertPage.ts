@@ -11,6 +11,8 @@ export class PartnerCertPage {
     readonly courseItems: Locator;
     readonly partnerExclusiveLabel: Locator;
     readonly coreTabs: Locator;
+    readonly tabItems: Locator;
+    readonly examRegisterBtns: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -18,6 +20,8 @@ export class PartnerCertPage {
         this.courseItems = page.locator('.partner-cert-course .course-item');
         this.partnerExclusiveLabel = page.getByText('伙伴专属', { exact: true });
         this.coreTabs = page.locator('.partner-core-tabs');
+        this.tabItems = page.locator('.partner-core-tabs .el-tabs__item');
+        this.examRegisterBtns = page.getByRole('button', { name: '报名考试' });
     }
 
     async goto() {
@@ -27,6 +31,18 @@ export class PartnerCertPage {
 
     async getCourseCount() {
         return this.courseItems.count();
+    }
+
+    async getTabCount() {
+        return this.tabItems.count();
+    }
+
+    async switchTab(tabName: string) {
+        await this.page.getByRole('tab', { name: tabName }).click();
+    }
+
+    async getExamRegisterCount() {
+        return this.examRegisterBtns.count();
     }
 
     async isPartnerExclusiveVisible() {
