@@ -7,19 +7,23 @@
 
 ```powershell
 # 账号：复制根目录 accounts.example.json → accounts.local.json 并填写
+# admin 需具备后台「用户授权」权限；user 作为被授权账号
 # 环境：tcQa | tcDev | tcGray
 
+# 推荐管线：Admin 造数 → Website 验证
+$env:ENV="tcQa"; pnpm run test:tc-admin:seed       # @Seed 用户授权 → catalog.json
 $env:ENV="tcQa"; pnpm run test:tc-platform:smoke   # @Smoke
 $env:ENV="tcQa"; pnpm run test:tc-platform         # 全量（含 @Regression）
 ```
 
 | 角色 | 账号键 | 用途 |
 |------|--------|------|
-| user | `accounts.user` | 课程、认证考试、NCRE、我的考试/证书 |
-| admin | `accounts.admin` | 团队服务 |
+| user | `accounts.user` | 课程、认证考试、NCRE、我的考试/证书；Seed 被授权方 |
+| admin | `accounts.admin` | 团队服务；TC-Admin 造数（需用户授权权限） |
 | partner | `accounts.partner` | 伙伴认证 |
 
-登录态由 `global-setup` 写入 `.auth/{role}.json`（已 gitignore）。
+登录态由 `global-setup` 写入 `.auth/{role}.json`（已 gitignore）。  
+造数产物：`tests/testData/generated/catalog.json`（gitignore）；Website 通过 `lib/loadTcTestData.ts` 优先合并 catalog。
 
 ## 用例 ID 规则
 
@@ -58,8 +62,9 @@ $env:ENV="tcQa"; pnpm run test:tc-platform         # 全量（含 @Regression）
 
 | 文件 | 关键字段 | 说明 |
 |------|----------|------|
-| `../testData/courses.json` | `firstCourse.id` | 空则打开 `/course` 默认课 |
-| `../testData/certs.json` | `firstCert.id` | 认证详情/考试必填；优先「有权限且未考过」 |
+| `../testData/courses.json` | `firstCourse.id` | 空则打开 `/course` 默认课；有 catalog.courses[0].id 时覆盖 |
+| `../testData/certs.json` | `firstCert.id` | 认证详情/考试必填；优先 catalog.certs[0].id，否则静态配置 |
+| `../testData/generated/catalog.json` | `auth[]` 等 | Admin Seed 写入；勿提交 |
 | `../testData/ncre.json` | — | 路由参考 |
 | `../testData/partner.json` | — | 路由参考 |
 
@@ -87,4 +92,6 @@ $env:ENV="tcQa"; pnpm run test:tc-platform         # 全量（含 @Regression）
 | Fixture / PO 注入 | `lib/BaseTest.ts` |
 | OAuth + storageState | `lib/TcAuth.ts`、`global-setup.ts` |
 | 账号加载 | `lib/loadAccounts.ts`、`accounts.example.json` |
-| Playwright project | `playwright.config.ts` → `TC-Platform` |
+| Playwright project | `playwright.config.ts` → `TC-Platform` / `TC-Admin` |
+| Admin 造数 Seed | `tests/tc-admin/seed-user-auth.spec.ts` |
+| Catalog / 测数合并 | `lib/catalog.ts`、`lib/loadTcTestData.ts` |

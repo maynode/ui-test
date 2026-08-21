@@ -6,7 +6,8 @@ export function adminBaseURL(env = process.env.ENV || 'tcQa'): string {
     const fromEnv = process.env.TC_ADMIN_BASE_URL?.trim();
     if (fromEnv) return fromEnv.replace(/\/?$/, '/');
 
-    const website = (testConfig as Record<string, string>)[env] || testConfig.tcQa;
+    const website =
+        (testConfig[env as keyof typeof testConfig] as string | undefined) || testConfig.tcQa;
     return `${website.replace(/\/$/, '')}${DEFAULT_ADMIN_SUFFIX}`;
 }
 

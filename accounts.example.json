@@ -5,7 +5,8 @@
   },
   "admin": {
     "username": "your-admin-phone-or-email",
-    "password": "your-password"
+    "password": "your-password",
+    "_comment": "需具备 etcert-admin 后台「用户授权」菜单权限，供 test:tc-admin:seed 使用"
   },
   "partner": {
     "username": "your-partner-phone-or-email",

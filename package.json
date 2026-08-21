@@ -23,7 +23,8 @@
     "test:accessibility": "cross-env ENV=%ENV% playwright test Axe.test.ts --project=Chrome",
     "test:tc-platform": "cross-env ENV=%ENV% playwright test --project=TC-Platform",
     "test:tc-platform:smoke": "cross-env ENV=%ENV% playwright test --grep @Smoke --project=TC-Platform --workers=1",
-    "test:tc-platform:ci": "playwright test --grep @Smoke --project=TC-Platform --workers=1"
+    "test:tc-platform:ci": "playwright test --grep @Smoke --project=TC-Platform --workers=1",
+    "test:tc-admin:seed": "cross-env ENV=%ENV% playwright test --project=TC-Admin --grep @Seed --workers=1"
   },
   "repository": {
     "type": "git",

@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { chromium, type Page } from '@playwright/test';
 import { getAccount, hasAccount, type AccountRole } from './loadAccounts';
+import { adminBaseURL as resolveAdminBaseURL } from './tcAdminConfig';
 
 export const AUTH_DIR = path.resolve(process.cwd(), '.auth');
 
@@ -30,6 +31,44 @@ async function fillZwsoftAccountLogin(page: Page, role: AccountRole): Promise<vo
     await page.getByRole('link', { name: /登\s*录/ }).click();
 }
 
+function normalizeAdminBase(adminBase: string): string {
+    return adminBase.replace(/\/?$/, '/');
+}
+
+/**
+ * Admin OAuth：用户授权页 →「授权登录」→ testaccounts.zwsoft.cn → 回跳 etcert-admin。
+ * Navigation uses the passed adminBase (not tcAdminConfig defaults).
+ */
+export async function loginAsAdmin(page: Page, adminBase: string): Promise<void> {
+    const normalizedAdminBase = normalizeAdminBase(adminBase);
+    await page.goto(`${normalizedAdminBase}#/platformAuth/user`, { waitUntil: 'domcontentloaded' });
+
+    const addAuth = page.getByRole('button', { name: '新增授权' });
+    const oauthBtn = page.getByRole('button', { name: '授权登录' });
+
+    try {
+        await Promise.race([
+            addAuth.waitFor({ state: 'visible', timeout: 60_000 }),
+            oauthBtn.waitFor({ state: 'visible', timeout: 60_000 }),
+            page.waitForURL(/testaccounts\.zwsoft\.cn/, { timeout: 60_000 }),
+        ]);
+    } catch {
+        throw new Error('Admin login: expected 新增授权, 授权登录, or testaccounts.zwsoft.cn');
+    }
+
+    if (await addAuth.isVisible().catch(() => false)) {
+        return;
+    }
+
+    if (await oauthBtn.isVisible().catch(() => false)) {
+        await oauthBtn.click();
+    }
+
+    await fillZwsoftAccountLogin(page, 'admin');
+    await page.waitForURL(/etcert-admin/, { timeout: 90_000 });
+    await page.waitForLoadState('networkidle');
+}
+
 /** OAuth 登录：首页「注册/登录」→ testaccounts.zwsoft.cn → 回跳平台 */
 export async function loginAs(page: Page, baseURL: string, role: AccountRole = 'user'): Promise<void> {
     await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
@@ -46,16 +85,33 @@ export async function loginAs(page: Page, baseURL: string, role: AccountRole = '
     }
 }
 
-async function saveAuthState(baseURL: string, role: AccountRole): Promise<void> {
+async function saveAuthState(
+    websiteBaseURL: string,
+    role: AccountRole,
+    adminBaseURL?: string,
+): Promise<void> {
+    const isAdmin = role === 'admin';
+    const contextBaseURL = isAdmin
+        ? normalizeAdminBase(adminBaseURL ?? '')
+        : websiteBaseURL;
+
+    if (isAdmin && !adminBaseURL) {
+        throw new Error('[tc-auth] adminBaseURL is required when generating admin storageState.');
+    }
+
     const browser = await chromium.launch({ channel: 'chrome', headless: true });
     const context = await browser.newContext({
-        baseURL,
+        baseURL: contextBaseURL,
         ignoreHTTPSErrors: true,
     });
     const page = await context.newPage();
 
     try {
-        await loginAs(page, baseURL, role);
+        if (isAdmin) {
+            await loginAsAdmin(page, adminBaseURL!);
+        } else {
+            await loginAs(page, websiteBaseURL, role);
+        }
         await fs.mkdir(AUTH_DIR, { recursive: true });
         await context.storageState({ path: AUTH_FILES[role] });
     } finally {
@@ -63,9 +119,10 @@ async function saveAuthState(baseURL: string, role: AccountRole): Promise<void> 
     }
 }
 
-export async function setupTcAuthStates(baseURL: string): Promise<void> {
+export async function setupTcAuthStates(websiteBaseURL: string, adminBaseURL?: string): Promise<void> {
     const roles: AccountRole[] = ['user', 'admin', 'partner'];
     const availableRoles = roles.filter(hasAccount);
+    const resolvedAdminBaseURL = adminBaseURL ?? resolveAdminBaseURL();
 
     if (availableRoles.length === 0) {
         console.warn(
@@ -77,6 +134,10 @@ export async function setupTcAuthStates(baseURL: string): Promise<void> {
 
     for (const role of availableRoles) {
         console.log(`[tc-auth] Generating storageState for role: ${role}`);
-        await saveAuthState(baseURL, role);
+        if (role === 'admin') {
+            await saveAuthState(websiteBaseURL, role, resolvedAdminBaseURL);
+        } else {
+            await saveAuthState(websiteBaseURL, role);
+        }
     }
 }

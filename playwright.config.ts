@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { PlaywrightTestConfig, devices } from '@playwright/test';
 import { getAuthStatePath } from './lib/TcAuth';
+import { adminBaseURL } from './lib/tcAdminConfig';
 import { testConfig } from './testConfig';
 // import { OrtoniReportConfig } from 'ortoni-report';
 
@@ -26,6 +27,7 @@ const ignoreHTTPSErrorsByEnvironment: Record<TestEnvironment, boolean> = {
 };
 const ignoreHTTPSErrors = ignoreHTTPSErrorsByEnvironment[currentEnvironment];
 const tcUserAuthState = fs.existsSync(getAuthStatePath('user')) ? getAuthStatePath('user') : undefined;
+const tcAdminAuthState = fs.existsSync(getAuthStatePath('admin')) ? getAuthStatePath('admin') : undefined;
 
 // const reportConfig: OrtoniReportConfig = {
 //   base64Image: true,
@@ -193,6 +195,26 @@ const config: PlaywrightTestConfig = {
         video: `retain-on-failure`,
         trace: `retain-on-failure`,
         ...(tcUserAuthState ? { storageState: tcUserAuthState } : {}),
+        launchOptions: {
+          slowMo: 0
+        }
+      },
+    },
+    {
+      name: `TC-Admin`,
+      testDir: `./tests/tc-admin`,
+      use: {
+        browserName: `chromium`,
+        channel: `chrome`,
+        baseURL: adminBaseURL(currentEnvironment),
+        headless: isCI,
+        viewport: { width: 1500, height: 730 },
+        ignoreHTTPSErrors,
+        acceptDownloads: true,
+        screenshot: `only-on-failure`,
+        video: `retain-on-failure`,
+        trace: `retain-on-failure`,
+        ...(tcAdminAuthState ? { storageState: tcAdminAuthState } : {}),
         launchOptions: {
           slowMo: 0
         }

@@ -1,10 +1,10 @@
 import test from '@lib/BaseTest';
 import { expect } from '@playwright/test';
+import { getCertId } from '@lib/loadTcTestData';
 import { tcAuthConfig } from '@lib/tcAuthConfig';
-import certData from '../testData/certs.json';
 
 const auth = tcAuthConfig('user');
-const certId = certData.firstCert.id;
+const certId = getCertId();
 
 /**
  * 认证考试主流程测试
