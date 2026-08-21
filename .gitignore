@@ -8,3 +8,4 @@ logs/
 html-report/
 .auth/
 accounts.local.json
+tests/testData/generated/catalog.json

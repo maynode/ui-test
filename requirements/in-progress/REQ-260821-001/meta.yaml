@@ -1,0 +1,24 @@
+﻿req_id: REQ-260821-001
+title: "Admin 造数 → Catalog → Website 验证管线"
+created: 2026-08-21
+phase: implement
+review_status: pending
+review_round: 0
+last_skill: subagent-driven-dev
+tasks:
+  - id: 1
+    desc: "Admin URL 与 Catalog 基建"
+    status: done
+    summary: "新增 catalog 读写与 adminBaseURL/adminPageUrl；gitignore catalog.json；round-trip 校验通过"
+  - id: 2
+    desc: "Admin OAuth 登录态"
+    status: pending
+  - id: 3
+    desc: "TC-Admin project + UserAuthPage + 首切片 Seed"
+    status: pending
+  - id: 4
+    desc: "Website 消费 Catalog"
+    status: pending
+last_updated: 2026-08-21
+context:
+  after_task_1: "Added lib/catalog.ts (emptyCatalog/loadCatalog/saveCatalog/appendAuth, CATALOG_PATH) and lib/tcAdminConfig.ts (adminBaseURL/adminPageUrl from testConfig or TC_ADMIN_BASE_URL). Generated catalog.json is gitignored; .gitkeep under tests/testData/generated/."
