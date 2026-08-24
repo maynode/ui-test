@@ -28,6 +28,7 @@ const ignoreHTTPSErrorsByEnvironment: Record<TestEnvironment, boolean> = {
 const ignoreHTTPSErrors = ignoreHTTPSErrorsByEnvironment[currentEnvironment];
 const tcUserAuthState = fs.existsSync(getAuthStatePath('user')) ? getAuthStatePath('user') : undefined;
 const tcAdminAuthState = fs.existsSync(getAuthStatePath('admin')) ? getAuthStatePath('admin') : undefined;
+// Website 团队用例由 spec 内 tcWebsiteAdminAuthConfig 绑定 admin-website.json，不在此 project 默认注入
 
 // const reportConfig: OrtoniReportConfig = {
 //   base64Image: true,

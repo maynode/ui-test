@@ -1,8 +1,10 @@
 import test from '@lib/BaseTest';
 import { expect } from '@playwright/test';
+import { getCourseId } from '@lib/loadTcTestData';
 import { tcAuthConfig } from '@lib/tcAuthConfig';
 
 const auth = tcAuthConfig('user');
+const courseId = getCourseId();
 
 /**
  * 课程学习主流程测试
@@ -18,8 +20,8 @@ test.describe('课程学习主流程', () => {
     });
 
     test('TC-COURSE-001 课程详情页加载与入口展示', { tag: '@Smoke' }, async ({ courseListPage }) => {
-        await test.step('导航到课程页', async () => {
-            await courseListPage.goto();
+        await test.step('导航到课程页（优先 catalog/静态 courseId）', async () => {
+            await courseListPage.goto(courseId);
         });
 
         await test.step('验证课程详情容器可见', async () => {
@@ -33,7 +35,7 @@ test.describe('课程学习主流程', () => {
 
     test('TC-COURSE-002 进入学习流程', { tag: '@Smoke' }, async ({ courseListPage, courseDetailPage }) => {
         await test.step('导航到课程页', async () => {
-            await courseListPage.goto();
+            await courseListPage.goto(courseId);
         });
 
         await test.step('点击开始学习', async () => {

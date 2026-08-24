@@ -25,6 +25,8 @@ test.describe('伙伴认证模块', () => {
         await test.step('验证页面容器与选项卡可见', async () => {
             await expect(partnerCertPage.container).toBeVisible();
             await expect(partnerCertPage.coreTabs).toBeVisible();
+            const tabCount = await partnerCertPage.getTabCount();
+            expect(tabCount).toBeGreaterThan(0);
         });
     });
 

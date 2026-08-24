@@ -1,0 +1,42 @@
+req_id: REQ-260824-001
+title: "主流程 E2E 硬化：考试前置 / SSO / 用例拆分 / 断言加深"
+created: 2026-08-24
+phase: code-review
+review_status: approved
+review_round: 1
+last_skill: code-review-manager
+tasks:
+  - id: 1
+    desc: "ExamPage 考试前置重写（向导/须知/客观题）"
+    status: done
+    summary: "waitForPreExamOrAnswer + completePrepareWizard/Notice；未实名抛错；客观题翻页寻找"
+  - id: 2
+    desc: "cert-exam 拆分 Smoke 与 Destructive + certId 策略"
+    status: done
+    summary: "001/001b @Smoke；002 @Destructive；001b 兼容终态文案"
+  - id: 3
+    desc: "admin-website storageState + 团队用例接线"
+    status: done
+    summary: "admin-website.json + tcWebsiteAdminAuthConfig；team 用例改用"
+  - id: 4
+    desc: "课程用例接 getCourseId"
+    status: done
+  - id: 5
+    desc: "catalog appendCert/Course/Exam 与 loadTcTestData 加固"
+    status: done
+    summary: "appendCert/Course/Exam + getExamId"
+  - id: 6
+    desc: "NCRE/伙伴/团队断言加深 + README"
+    status: done
+    summary: "README + test:tc-platform:destructive；全量排除 Destructive"
+last_updated: 2026-08-24
+context:
+  note: "REQ-260821-002 仍负责 Admin UI 造认证/课程/考试；本需求只补 catalog 契约"
+  review:
+    strengths:
+      - "考试前置按页面边界等待，与 website 向导/须知一致"
+      - "admin 后台态与 website 态分离，团队用例不再误绑 admin.json"
+      - "Destructive 与 Smoke 命令拆分，降低误跑交卷风险"
+    issues: []
+    assessment: Ready
+    verification: "tsc --noEmit pass; eslint changed files pass; 无 accounts.local 未真跑 E2E"

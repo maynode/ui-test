@@ -1,12 +1,13 @@
 import test from '@lib/BaseTest';
 import { expect } from '@playwright/test';
-import { tcAuthConfig } from '@lib/tcAuthConfig';
+import { tcWebsiteAdminAuthConfig } from '@lib/tcAuthConfig';
 
-const auth = tcAuthConfig('admin');
+const auth = tcWebsiteAdminAuthConfig();
 
 /**
  * 团队服务主流程测试
  * 对应前端：website/src/pages/user/myTeam/components/MyTeam.vue
+ * 登录态：admin 账号经 Website OAuth（.auth/admin-website.json），非 Admin 后台态
  */
 test.describe('团队服务主流程', () => {
     if (auth.ready && auth.storageState) {
@@ -36,6 +37,12 @@ test.describe('团队服务主流程', () => {
             const isEmpty = await myTeamPage.isEmptyState();
             const hasTeam = await myTeamPage.hasTeamSection();
             expect(isEmpty || hasTeam).toBeTruthy();
+            if (isEmpty) {
+                await expect(myTeamPage.openTeamCourseBtn).toBeVisible();
+                await expect(myTeamPage.openTeamCertBtn).toBeVisible();
+            } else {
+                await expect(myTeamPage.teamSections.first()).toBeVisible();
+            }
         });
     });
 
@@ -48,6 +55,11 @@ test.describe('团队服务主流程', () => {
             if (await myTeamPage.isEmptyState()) {
                 await expect(myTeamPage.openTeamCourseBtn).toBeVisible();
                 await expect(myTeamPage.openTeamCertBtn).toBeVisible();
+            } else {
+                test.info().annotations.push({
+                    type: 'note',
+                    description: '账号已有团队数据，跳过空态开通入口断言',
+                });
             }
         });
     });

@@ -6,13 +6,21 @@ import { adminBaseURL as resolveAdminBaseURL } from './tcAdminConfig';
 
 export const AUTH_DIR = path.resolve(process.cwd(), '.auth');
 
+/** Website 侧以 admin 账号登录的 storageState（团队服务等 C 端页） */
+export const ADMIN_WEBSITE_AUTH_FILE = path.join(AUTH_DIR, 'admin-website.json');
+
 const AUTH_FILES: Record<AccountRole, string> = {
     user: path.join(AUTH_DIR, 'user.json'),
     admin: path.join(AUTH_DIR, 'admin.json'),
     partner: path.join(AUTH_DIR, 'partner.json'),
 };
 
-export function getAuthStatePath(role: AccountRole): string {
+export type AuthStateKey = AccountRole | 'adminWebsite';
+
+export function getAuthStatePath(role: AuthStateKey): string {
+    if (role === 'adminWebsite') {
+        return ADMIN_WEBSITE_AUTH_FILE;
+    }
     return AUTH_FILES[role];
 }
 
@@ -119,6 +127,24 @@ async function saveAuthState(
     }
 }
 
+/** Website 上以 admin 账号登录，供 /user/myTeam 等 C 端用例（与后台 admin.json 分离） */
+async function saveAdminWebsiteAuthState(websiteBaseURL: string): Promise<void> {
+    const browser = await chromium.launch({ channel: 'chrome', headless: true });
+    const context = await browser.newContext({
+        baseURL: websiteBaseURL,
+        ignoreHTTPSErrors: true,
+    });
+    const page = await context.newPage();
+
+    try {
+        await loginAs(page, websiteBaseURL, 'admin');
+        await fs.mkdir(AUTH_DIR, { recursive: true });
+        await context.storageState({ path: ADMIN_WEBSITE_AUTH_FILE });
+    } finally {
+        await browser.close();
+    }
+}
+
 export async function setupTcAuthStates(websiteBaseURL: string, adminBaseURL?: string): Promise<void> {
     const roles: AccountRole[] = ['user', 'admin', 'partner'];
     const availableRoles = roles.filter(hasAccount);
@@ -136,6 +162,8 @@ export async function setupTcAuthStates(websiteBaseURL: string, adminBaseURL?: s
         console.log(`[tc-auth] Generating storageState for role: ${role}`);
         if (role === 'admin') {
             await saveAuthState(websiteBaseURL, role, resolvedAdminBaseURL);
+            console.log('[tc-auth] Generating storageState for admin on website (admin-website.json)');
+            await saveAdminWebsiteAuthState(websiteBaseURL);
         } else {
             await saveAuthState(websiteBaseURL, role);
         }

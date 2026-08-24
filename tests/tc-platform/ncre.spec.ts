@@ -22,8 +22,15 @@ test.describe('NCRE 模块', () => {
             await ncrePage.goto();
         });
 
-        await test.step('验证 NCRE 容器可见', async () => {
+        await test.step('验证 NCRE 容器与考生区可见', async () => {
             await expect(ncrePage.container).toBeVisible();
+            await expect(ncrePage.studentPanel).toBeVisible();
+        });
+
+        await test.step('验证考生 Tab 可切换', async () => {
+            await expect(ncrePage.studentTab).toBeVisible();
+            await ncrePage.switchToStudentTab();
+            await expect(ncrePage.studentPanel).toBeVisible();
         });
     });
 });
