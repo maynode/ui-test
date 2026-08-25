@@ -1,5 +1,6 @@
 import { Reporter, TestCase, TestError, TestResult, TestStep } from "@playwright/test/reporter";
 const winston = require(`winston`);
+const envLabel = process.env.ENV || process.env.npm_config_ENV || 'unknown-env';
 
 const console = new winston.transports.Console();
 const logger = winston.createLogger({
@@ -17,16 +18,16 @@ logger.add(console);
 export default class CustomReporterConfig implements Reporter {
 
     onTestBegin(test: TestCase): void {
-        logger.info(`Test Case Started : ${test.title}`);
+        logger.info(`[ENV=${envLabel}] Test Case Started : ${test.title}`);
     }
 
     onTestEnd(test: TestCase, result: TestResult): void {
-        logger.info(`Test Case Completed : ${test.title} Status : ${result.status}`);
+        logger.info(`[ENV=${envLabel}] Test Case Completed : ${test.title} Status : ${result.status}`);
     }
 
     onStepBegin(test: TestCase, result: TestResult, step: TestStep): void {
         if (step.category === `test.step`) {
-            logger.info(`Executing Step : ${step.title}`);
+            logger.info(`[ENV=${envLabel}] Executing Step : ${step.title}`);
         }
     }
 

@@ -7,21 +7,23 @@ import { testConfig } from './testConfig';
 
 const ENV = process.env.ENV || process.env.npm_config_ENV; // Support both modern and legacy patterns
 const isCI = !!process.env.CI; // Detect if running in CI environment
-const validEnvironments = [`qa`, `dev`, `qaApi`, `devApi`, `tcQa`, `tcDev`, `tcGray`] as const;
+const validEnvironments = [`qa`, `dev`, `qaApi`, `devApi`, `tcQa`, `tcTest`, `tcDev`, `tcGray`] as const;
 type TestEnvironment = typeof validEnvironments[number];
 
 if (!ENV || !validEnvironments.includes(ENV as TestEnvironment)) {
-  console.log(`Please provide a correct environment value after command like "--ENV=qa|dev|qaApi|devApi|tcQa|tcDev|tcGray"`);
+  console.log(`Please provide a correct environment value after command like "--ENV=qa|dev|qaApi|devApi|tcQa|tcTest|tcDev|tcGray"`);
   process.exit();
 }
 
 const currentEnvironment = ENV as TestEnvironment;
+const htmlReportFolder = `html-report/${currentEnvironment}`;
 const ignoreHTTPSErrorsByEnvironment: Record<TestEnvironment, boolean> = {
   qa: false,
   dev: true,
   qaApi: true,
   devApi: true,
   tcQa: true,
+  tcTest: true,
   tcDev: true,
   tcGray: true,
 };
@@ -52,8 +54,8 @@ const config: PlaywrightTestConfig = {
 
   //Reporters
     reporter: isCI 
-    ? [[`./CustomReporterConfig.ts`], [`allure-playwright`], [`html`, { outputFolder: 'html-report', open: 'never' }]]
-    : [[`./CustomReporterConfig.ts`], [`allure-playwright`], [`html`, { outputFolder: 'html-report', open: 'never' }]],
+    ? [[`./CustomReporterConfig.ts`], [`allure-playwright`], [`html`, { outputFolder: htmlReportFolder, open: 'never' }]]
+    : [[`./CustomReporterConfig.ts`], [`allure-playwright`], [`html`, { outputFolder: htmlReportFolder, open: 'never' }]],
     // ortoni-report disabled on Windows until sqlite3 native bindings are available
     // : [[`./CustomReporterConfig.ts`], [`allure-playwright`], [`html`, { outputFolder: 'html-report', open: 'never' }],['ortoni-report', reportConfig]],
 

@@ -61,7 +61,8 @@ export function appendCert(entry: CatalogEntity, runId: string, env: string): Ca
     if (!entry.id?.trim()) {
         throw new Error('appendCert: entry.id is required');
     }
-    current.certs.push(entry);
+    // 最新写入置顶，与 loadTcTestData 读 [0] 一致
+    current.certs.unshift(entry);
     current.runId = runId;
     current.env = env;
     saveCatalog(current);
@@ -73,7 +74,7 @@ export function appendCourse(entry: CatalogEntity, runId: string, env: string): 
     if (!entry.id?.trim()) {
         throw new Error('appendCourse: entry.id is required');
     }
-    current.courses.push(entry);
+    current.courses.unshift(entry);
     current.runId = runId;
     current.env = env;
     saveCatalog(current);
@@ -85,7 +86,7 @@ export function appendExam(entry: CatalogEntity, runId: string, env: string): Ca
     if (!entry.id?.trim()) {
         throw new Error('appendExam: entry.id is required');
     }
-    current.exams.push(entry);
+    current.exams.unshift(entry);
     current.runId = runId;
     current.env = env;
     saveCatalog(current);

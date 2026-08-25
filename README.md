@@ -33,6 +33,8 @@
 
 Playwright Demo - This project is based on Microsoft Playwright which enables reliable end-to-end testing for modern web apps.
 
+> **培训认证平台（tc-platform）主流程**：先看根目录执行清单 [`RUNBOOK.md`](RUNBOOK.md)，再看详情文档 [`tests/tc-platform/README.md`](tests/tc-platform/README.md)。根目录下列 Usage 多为原版 DemoQA 样例，**不要**用 `pnpm run test` 当作认证平台全量。
+
 Top Features:
 
 - Easy to Configure.
