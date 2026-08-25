@@ -1,0 +1,28 @@
+req_id: REQ-260821-002
+title: "Admin Seed P1：认证资源 / 课程 / 考试造数"
+created: 2026-08-21
+phase: plan
+review_status: pending
+review_round: 0
+last_skill: writing-plans
+tasks:
+  - id: 1
+    desc: "Catalog 类型与 appendCert/Course/Exam"
+    status: pending
+  - id: 2
+    desc: "产品资源 PO + SEED-CERT-RES-001"
+    status: pending
+  - id: 3
+    desc: "课程 PO + SEED-COURSE-001"
+    status: pending
+  - id: 4
+    desc: "考试 PO + SEED-EXAM-001"
+    status: pending
+  - id: 5
+    desc: "脚本与 README"
+    status: pending
+  - id: 6
+    desc: "getExamId 轻量接线"
+    status: pending
+last_updated: 2026-08-21
+context: {}
