@@ -12,7 +12,7 @@
 ### 1. 账号（必配）
 
 ```powershell
-# 在 ui-test 根目录
+# 在 etcert-e2e 根目录
 Copy-Item accounts.example.json accounts.local.json
 # 编辑 accounts.local.json，填入真实账号（该文件已 gitignore，勿提交）
 ```
@@ -129,8 +129,8 @@ pnpm run test:tc-platform:smoke --ENV=tcTest
 | TC-TEAM-002 | 团队服务区块或空态展示 | @Regression | admin-website | — | 已写 |
 | TC-TEAM-003 | 空态下开通入口可见 | @Regression | admin-website | 空态账号更佳 | 已写 |
 | TC-NCRE-001 | NCRE 模块加载 | @Smoke | user | — | 已写 |
-| TC-PARTNER-001 | 伙伴认证模块加载 | @Smoke | partner | — | 已写 |
-| TC-PARTNER-002 | 伙伴专属权益与课程展示 | @Regression | partner | — | 已写 |
+| TC-PARTNER-001 | 伙伴认证模块加载（岗位区块平铺） | @Smoke | partner | — | 已写 |
+| TC-PARTNER-002 | 伙伴专属权益与课程/去考试展示 | @Regression | partner | — | 已写 |
 
 **合计**：13 条（8 Smoke + 4 Regression + 1 Destructive）
 
@@ -166,7 +166,7 @@ Website 消费：`getCertId()` / `getCourseId()` / `getExamId()` 优先读 catal
 ### 第二批
 - 团队：折叠展开、名额管理
 - NCRE：考点 Tab、课程区
-- 伙伴：多 Tab、报名考试
+- 伙伴：岗位内多阶段展开、去考试跳转认证详情
 
 ### 第三批
 - 无会员 / 无认证权限 / 非 partner 等账号态

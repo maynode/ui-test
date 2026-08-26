@@ -3,8 +3,12 @@
   "partnerCert": {
     "url": "/partnerCert",
     "containerSelector": ".partner-cert-page",
+    "sectionListSelector": ".partner-section-list",
+    "sectionBlockSelector": ".partner-cert-course",
     "exclusiveLabel": "伙伴专属",
     "courseItemSelector": ".partner-cert-course .course-item",
-    "tabsSelector": ".partner-core-tabs"
+    "goExamTestId": "partner-go-exam",
+    "studyTestId": "partner-study-btn",
+    "stageTitleSelector": ".partner-cert-course .stage__title"
   }
 }

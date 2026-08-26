@@ -31,7 +31,12 @@ function readLocalAccountsFile(): AccountsFile {
 }
 
 function isPlaceholder(value: string): boolean {
-    return !value || value.includes('example.com') || value.startsWith('U2FsdGVkX1');
+    return (
+        !value ||
+        value.includes('example.com') ||
+        value.startsWith('U2FsdGVkX1') ||
+        value.startsWith('your-')
+    );
 }
 
 export function getAccount(role: AccountRole): AccountCredentials {

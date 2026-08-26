@@ -2,9 +2,9 @@
 
 > **For agentic workers:** Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 修复 `ui-test` 中 TC-Platform / TC-Admin 主流程自动化与真实前端不一致、登录态错配、数据与断言偏弱的问题，使 Smoke 可稳定跑通、完整交卷可隔离执行。
+**Goal:** 修复 `etcert-e2e` 中 TC-Platform / TC-Admin 主流程自动化与真实前端不一致、登录态错配、数据与断言偏弱的问题，使 Smoke 可稳定跑通、完整交卷可隔离执行。
 
-**Architecture:** 仅改 `ui-test`。核心是重写 `ExamPage` 前置（等待页面边界 → 向导多步 → 须知勾选与倒计时 → 答题页），将破坏性交卷标为 `@Destructive`；为 Website 团队用例单独生成 `admin-website.json`（website OAuth），与 Admin 后台的 `admin.json` 分离；课程用例消费 `getCourseId()`；catalog 补齐 `appendCert/Course/Exam` 供后续造数写入；加深 NCRE/伙伴/团队断言并更新 README。完整 Admin 建认证/课程/考试 UI 造数仍由 `REQ-260821-002` 承接，本需求只把 catalog 契约与 Website 消费侧补齐。
+**Architecture:** 仅改 `etcert-e2e`。核心是重写 `ExamPage` 前置（等待页面边界 → 向导多步 → 须知勾选与倒计时 → 答题页），将破坏性交卷标为 `@Destructive`；为 Website 团队用例单独生成 `admin-website.json`（website OAuth），与 Admin 后台的 `admin.json` 分离；课程用例消费 `getCourseId()`；catalog 补齐 `appendCert/Course/Exam` 供后续造数写入；加深 NCRE/伙伴/团队断言并更新 README。完整 Admin 建认证/课程/考试 UI 造数仍由 `REQ-260821-002` 承接，本需求只把 catalog 契约与 Website 消费侧补齐。
 
 **Tech Stack:** Playwright Test、现有 Page Object、`TcAuth` / `catalog` / `loadTcTestData`
 
@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- 代码只改 `D:\CERT-ALL-CODES\ui-test`
+- 代码只改 `D:\CERT-ALL-CODES\etcert-e2e`
 - 不提交 `accounts.local.json` / `.auth` / `catalog.json`
 - 实名认证步骤不自动填身份证：未实名账号应明确失败提示
 - 完整交卷用例必须带 `@Destructive`，Smoke 默认不跑破坏性步骤
@@ -125,7 +125,7 @@ TcAuth (user / admin / partner / admin-website)
 - Modify: `tests/tc-platform/README.md`
 - Modify: `package.json`（可选 `test:tc-platform:destructive`）
 
-- [ ] **Step 1:** NCRE 断言 `studentPanel`；伙伴断言 `getTabCount()>0`；团队保持/加强
+- [ ] **Step 1:** NCRE 断言 `studentPanel`；伙伴断言岗位区块 `getSectionCount()>0`（平铺改版，见 REQ-260826-001）；团队保持/加强
 - [ ] **Step 2:** README 写清管线、admin-website、实名要求、`@Destructive` 命令；`package.json` 增加 destructive 脚本
 - [ ] **Step 3:** Stage
 
