@@ -148,7 +148,9 @@ pnpm run test:tc-platform:smoke --ENV=tcTest
 |------|----------|------|
 | `../testData/courses.json` | `firstCourse.id` | 空则打开 `/course` 默认课；有 catalog.courses[0].id 时覆盖 |
 | `../testData/certs.json` | `firstCert.id` | 认证详情/考试必填；优先 catalog.certs[0].id |
-| `../testData/generated/catalog.json` | `auth[]` / `certs[]` / `courses[]` / `exams[]` | Admin Seed 写入；勿提交。`appendCert|Course|Exam` 为 **unshift**（最新在 `[0]`） |
+| `../testData/generated/catalog.json` | `auth[]` / `certs[]` / `courses[]` / `exams[]` / `memberships[]` | Admin Seed 写入；勿提交 |
+| `../testData/seed-p2-matrix.md` | — | P2 自动 Seed vs 人工前置（团队/考试状态/伙伴/证书） |
+| `../testData/exam-states.example.json` | — | 多状态账号矩阵示例 |
 | `../testData/ncre.json` | — | 路由参考 |
 | `../testData/partner.json` | — | 路由参考 |
 
@@ -164,22 +166,22 @@ Website 消费：`getCertId()` / `getCourseId()` / `getExamId()` 优先读 catal
 | SEED-CERT-RES-001 | 产品资源绑/收编认证 → `certs[0].id`（= 资源ID） | admin；产品列表非空或 `TC_SEED_PRODUCT_ID`；可搜认证 |
 | SEED-COURSE-001 | 新建课程（**仅提交前失败**才收编首行）→ `courses[0]` | admin；新建需分类/标签，否则列表至少一行 |
 | SEED-EXAM-001 | 新建固定试卷考试（**仅提交前失败**才收编首行）→ `exams[0]` | admin；新建需已有试卷，否则列表至少一行 |
+| SEED-MEMBER-RES-001 | 收编会员资源首行 → `memberships[0]`（P2） | admin；会员详情资源表非空，否则 skip |
+
+P2 人工前置见 `../testData/seed-p2-matrix.md`。Admin 说明见 `tests/tc-admin/README.md`。
 
 ## 待补（后续加）
 
-### 第一批（有账号后）
-- 认证「进入模拟测试」
-- 破坏性交卷专用账号与环境重置
+完整 backlog 见：**[`../COVERAGE-BACKLOG.md`](../COVERAGE-BACKLOG.md)**（未覆盖 / 很浅 / 造数缺口 / 830 新功能）。
 
-### 第二批
-- 团队：名额分配/导入/移除操作
-- NCRE：考点 Tab、课程区
-- 伙伴：岗位内多阶段展开、去考试跳转认证详情断言
+摘要：
 
-### 第三批
-- 无会员 / 无认证权限等更多账号态
-- 考试多状态：按固定 Seed 账号分别断言（当前 TC-CERT-005 为环境自适应识别）
-- 未登录拦截：更多入口（认证详情进考、个人中心其它子页）
+| 优先级 | 方向 |
+|--------|------|
+| P0 加深 | 考试固定多状态、名额页内操作、NCRE 考点、伙伴跳转详情、更多未登录入口 |
+| P1 新用例 | 模拟测试、交卷专用账号、团队商城购买、负向账号态 |
+| P2 造数 | 成绩管理 Seed、发证 Seed、团队 Seed（待调研） |
+| P3 | 中望杯、个人中心会员卡、830 其它新页 |
 
 ## 相关代码
 

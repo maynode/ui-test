@@ -1,0 +1,21 @@
+req_id: REQ-260827-002
+title: "P2 Admin Seed 与测试数据矩阵"
+created: 2026-08-27
+phase: implement
+review_status: pending
+review_round: 0
+last_skill: subagent-driven-dev
+tasks:
+  - id: 1
+    desc: "catalog 扩展 memberships/certificates append"
+    status: done
+  - id: 2
+    desc: "SEED-MEMBER-RES-001 会员资源收编"
+    status: done
+  - id: 3
+    desc: "seed-p2-matrix 与 exam-states 示例"
+    status: done
+  - id: 4
+    desc: "README Seed 清单更新"
+    status: done
+last_updated: 2026-08-27

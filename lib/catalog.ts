@@ -25,12 +25,23 @@ export type Catalog = {
     exams: CatalogEntity[];
     certs: CatalogEntity[];
     certificates: CatalogEntity[];
+    memberships: CatalogEntity[];
 };
 
 export const CATALOG_PATH = path.resolve(process.cwd(), 'tests/testData/generated/catalog.json');
 
 export function emptyCatalog(runId: string, env: string): Catalog {
-    return { version: 1, runId, env, auth: [], courses: [], exams: [], certs: [], certificates: [] };
+    return {
+        version: 1,
+        runId,
+        env,
+        auth: [],
+        courses: [],
+        exams: [],
+        certs: [],
+        certificates: [],
+        memberships: [],
+    };
 }
 
 export function loadCatalog(): Catalog | null {
@@ -87,6 +98,30 @@ export function appendExam(entry: CatalogEntity, runId: string, env: string): Ca
         throw new Error('appendExam: entry.id is required');
     }
     current.exams.unshift(entry);
+    current.runId = runId;
+    current.env = env;
+    saveCatalog(current);
+    return current;
+}
+
+export function appendCertificate(entry: CatalogEntity, runId: string, env: string): Catalog {
+    const current = ensureCatalog(runId, env);
+    if (!entry.id?.trim()) {
+        throw new Error('appendCertificate: entry.id is required');
+    }
+    current.certificates.unshift(entry);
+    current.runId = runId;
+    current.env = env;
+    saveCatalog(current);
+    return current;
+}
+
+export function appendMembership(entry: CatalogEntity, runId: string, env: string): Catalog {
+    const current = ensureCatalog(runId, env);
+    if (!entry.id?.trim()) {
+        throw new Error('appendMembership: entry.id is required');
+    }
+    current.memberships.unshift(entry);
     current.runId = runId;
     current.env = env;
     saveCatalog(current);

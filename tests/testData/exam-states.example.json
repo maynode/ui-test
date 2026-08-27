@@ -1,0 +1,30 @@
+{
+  "description": "考试多状态账号矩阵示例。复制为 exam-states.local.json 本地维护（勿提交）。",
+  "accounts": {
+    "user": {
+      "role": "user",
+      "expectedState": "start",
+      "note": "默认 user；TC-CERT-005 当前自适应识别，不强制读此文件"
+    },
+    "userContinuing": {
+      "role": "user",
+      "username": "your-continuing-exam@example.com",
+      "expectedState": "continuing"
+    },
+    "userPending": {
+      "role": "user",
+      "username": "your-pending-result@example.com",
+      "expectedState": "pending"
+    },
+    "userPassed": {
+      "role": "user",
+      "username": "your-passed@example.com",
+      "expectedState": "pass"
+    },
+    "userFailedRetake": {
+      "role": "user",
+      "username": "your-failed-retake@example.com",
+      "expectedState": "fail-retake"
+    }
+  }
+}
