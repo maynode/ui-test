@@ -13,6 +13,7 @@ import { MyCertPage } from '@pages/MyCertPage';
 import { MyTeamPage } from '@pages/MyTeamPage';
 import { NcrePage } from '@pages/NcrePage';
 import { PartnerCertPage } from '@pages/PartnerCertPage';
+import { SeatsManagePage } from '@pages/SeatsManagePage';
 import { WebActions } from '@lib/WebActions';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -32,6 +33,7 @@ const test = baseTest.extend<{
     myTeamPage: MyTeamPage;
     ncrePage: NcrePage;
     partnerCertPage: PartnerCertPage;
+    seatsManagePage: SeatsManagePage;
     makeAxeBuilder: AxeBuilder;
     testInfo: TestInfo;
 }>({
@@ -79,6 +81,9 @@ const test = baseTest.extend<{
     },
     partnerCertPage: async ({ page }, use) => {
         await use(new PartnerCertPage(page));
+    },
+    seatsManagePage: async ({ page }, use) => {
+        await use(new SeatsManagePage(page));
     },
     makeAxeBuilder: async ({ page }, use) => {
         await use(new AxeBuilder({ page })

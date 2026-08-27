@@ -48,4 +48,18 @@ export class MyTeamPage {
     async expandFirstTeamSection() {
         await this.teamSections.first().locator('.my-team-collapse-item-head').click();
     }
+
+    async expandFirstCollapseAndWaitTable() {
+        await this.expandFirstTeamSection();
+        await this.collapseTables.first().waitFor({ state: 'visible' });
+    }
+
+    async isSeatManageVisible() {
+        return this.seatManageBtn.first().isVisible();
+    }
+
+    async openFirstSeatManage() {
+        await this.seatManageBtn.first().click();
+        await this.page.waitForURL(/\/user\/seatsMng/);
+    }
 }

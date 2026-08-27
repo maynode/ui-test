@@ -63,4 +63,33 @@ test.describe('团队服务主流程', () => {
             }
         });
     });
+
+    test('TC-TEAM-004 团队折叠区块可展开', { tag: '@Regression' }, async ({ myTeamPage }) => {
+        await test.step('导航到团队服务页', async () => {
+            await myTeamPage.goto();
+        });
+
+        await test.step('展开首个折叠项并验证表格可见', async () => {
+            test.skip(await myTeamPage.isEmptyState(), '空态账号无折叠区块');
+            await myTeamPage.expandFirstCollapseAndWaitTable();
+            await expect(myTeamPage.collapseTables.first()).toBeVisible();
+            await expect(myTeamPage.seatManageBtn.first()).toBeVisible();
+        });
+    });
+
+    test('TC-TEAM-005 名额管理页可进入', { tag: '@Regression' }, async ({ myTeamPage, seatsManagePage }) => {
+        await test.step('导航到团队服务页并展开折叠项', async () => {
+            await myTeamPage.goto();
+            test.skip(await myTeamPage.isEmptyState(), '空态账号无名额管理入口');
+            await myTeamPage.expandFirstCollapseAndWaitTable();
+        });
+
+        await test.step('点击名额管理进入管理页', async () => {
+            test.skip(!(await myTeamPage.isSeatManageVisible()), '折叠表格内无名额管理按钮');
+            await myTeamPage.openFirstSeatManage();
+            await seatsManagePage.waitForLoad();
+            await expect(seatsManagePage.breadcrumbTeamLink).toBeVisible();
+            await expect(seatsManagePage.assignMemberBtn).toBeVisible();
+        });
+    });
 });

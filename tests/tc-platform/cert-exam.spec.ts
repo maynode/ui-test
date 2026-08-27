@@ -125,4 +125,21 @@ test.describe('认证考试主流程', () => {
             }
         });
     });
+
+    test('TC-CERT-005 在线考试多状态 UI 识别', { tag: '@Regression' }, async ({ certDetailPage }) => {
+        test.skip(!certId, certSkipReason);
+
+        await test.step('导航到认证详情并进入在线考试步骤', async () => {
+            await certDetailPage.goto(certId!);
+            await certDetailPage.goToExamStep();
+        });
+
+        await test.step('识别当前考试状态并断言对应文案/按钮', async () => {
+            const state = await certDetailPage.assertRecognizedExamState();
+            test.info().annotations.push({
+                type: 'exam-state',
+                description: `detected=${state ?? 'unknown'}`,
+            });
+        });
+    });
 });

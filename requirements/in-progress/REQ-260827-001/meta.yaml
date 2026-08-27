@@ -1,0 +1,18 @@
+req_id: REQ-260827-001
+title: "E2E 补覆盖：考试多状态/团队名额/访问拦截"
+created: 2026-08-27
+phase: implement
+review_status: pending
+review_round: 0
+last_skill: subagent-driven-dev
+tasks:
+  - id: 1
+    desc: "扩展 CertDetailPage / MyTeamPage / PartnerCertPage / SeatsManagePage"
+    status: done
+  - id: 2
+    desc: "新增 access-control.spec；cert/team 补 TC-CERT-005、TC-TEAM-004/005"
+    status: done
+  - id: 3
+    desc: "更新 README 用例索引"
+    status: done
+last_updated: 2026-08-27

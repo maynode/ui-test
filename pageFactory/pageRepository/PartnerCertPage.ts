@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { BrowserContext, Page, Locator } from '@playwright/test';
 
 /**
  * 伙伴认证页 Page Object
@@ -55,5 +55,21 @@ export class PartnerCertPage {
 
     async isPartnerExclusiveVisible() {
         return this.partnerExclusiveLabel.isVisible();
+    }
+
+    async openFirstStudyInNewPage(context: BrowserContext) {
+        const popupPromise = context.waitForEvent('page');
+        await this.studyBtns.first().click();
+        const popup = await popupPromise;
+        await popup.waitForLoadState('domcontentloaded');
+        return popup;
+    }
+
+    async openFirstGoExamInNewPage(context: BrowserContext) {
+        const popupPromise = context.waitForEvent('page');
+        await this.goExamBtns.first().click();
+        const popup = await popupPromise;
+        await popup.waitForLoadState('domcontentloaded');
+        return popup;
     }
 }
