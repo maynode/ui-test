@@ -1,6 +1,9 @@
-# tc-platform 跑测步骤清单（SOP）
+# tc-platform / 主流程 跑测步骤清单（SOP）
 
 这份文档只回答一件事：**从 0 到出报告，按什么顺序跑**。
+
+> **产品主流程验收**（20 项清单）→ `pnpm run test:main-flow`（`tests/main-flow/`，见 [`tests/main-flow/README.md`](tests/main-flow/README.md)）  
+> **扩展回归 / 历史 Smoke** → `pnpm run test:tc-platform:smoke`
 
 ## 0. 前置条件（只需检查一次）
 
@@ -34,7 +37,24 @@ pnpm run test:tc-admin:seed --ENV=tcTest
 
 若这一步失败，先不要跑 Smoke。
 
-## 4. 跑主流程 Smoke（日常回归）
+## 4. 跑主流程验收（推荐 · 产品清单 20 项）
+
+```powershell
+pnpm run test:main-flow --ENV=tcTest
+```
+
+范围：
+- 只跑 `TC-MainFlow` 项目（`tests/main-flow/`）
+- 只跑 `@MainFlow`，不含 `@Destructive`
+- 对照表：[`tests/MAIN-FLOW-MATRIX.md`](tests/MAIN-FLOW-MATRIX.md)
+
+破坏性主流程（交卷等，2 条）：
+
+```powershell
+pnpm run test:main-flow:destructive --ENV=tcTest
+```
+
+## 5. 跑扩展 Smoke（可选 · tc-platform 历史门禁）
 
 ```powershell
 pnpm run test:tc-platform:smoke --ENV=tcTest
@@ -45,7 +65,7 @@ pnpm run test:tc-platform:smoke --ENV=tcTest
 - 只跑 `@Smoke`
 - 不含 `@Destructive`
 
-## 5. 打开 HTML 报告
+## 6. 打开 HTML 报告
 
 ```powershell
 pnpm exec playwright show-report html-report/tcTest
@@ -55,15 +75,15 @@ pnpm exec playwright show-report html-report/tcTest
 - 这个命令只“看报告”，不“跑用例”
 - 必须先执行过测试，`html-report/tcTest` 才存在
 
-## 6. 需要更全覆盖时（可选）
+## 7. 需要更全覆盖时（可选）
 
-### 6.1 全量（不含破坏性）
+### 7.1 tc-platform 全量（不含破坏性）
 
 ```powershell
 pnpm run test:tc-platform --ENV=tcTest
 ```
 
-### 6.2 仅破坏性（完整交卷等）
+### 7.2 tc-platform 破坏性（完整交卷等）
 
 ```powershell
 pnpm run test:tc-platform:destructive --ENV=tcTest
@@ -71,7 +91,7 @@ pnpm run test:tc-platform:destructive --ENV=tcTest
 
 建议用专用账号跑 destructive。
 
-## 7. 常见判断（很实用）
+## 8. 常见判断（很实用）
 
 - 看到 `skipped`：通常是缺对应角色账号或数据前置不足
 - 看到 `Missing credentials for role ...`：检查 `accounts.local.json`
@@ -82,6 +102,6 @@ pnpm run test:tc-platform:destructive --ENV=tcTest
 ```powershell
 cd d:\CERT-ALL-CODES\etcert-e2e
 pnpm run test:tc-admin:seed --ENV=tcTest
-pnpm run test:tc-platform:smoke --ENV=tcTest
+pnpm run test:main-flow --ENV=tcTest
 pnpm exec playwright show-report html-report/tcTest
 ```

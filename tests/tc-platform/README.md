@@ -1,6 +1,8 @@
 # tc-platform 用例索引
 
-培训认证平台（website / exam / admin 造数）E2E 说明。  
+培训认证平台（website / exam / admin 造数）**扩展回归**说明。  
+**产品主流程验收（20 项）** 见 [`../main-flow/README.md`](../main-flow/README.md)（`MF-*`，命令 `pnpm run test:main-flow`）。
+
 **代码即用例**：细节以 `*.spec.ts` 为准；本文件维护怎么跑、账号、命令范围、用例 ID 与覆盖状态。
 
 快速执行清单见：`RUNBOOK.md`（项目根目录）
@@ -172,7 +174,7 @@ P2 人工前置见 `../testData/seed-p2-matrix.md`。Admin 说明见 `tests/tc-a
 
 ## 待补（后续加）
 
-主流程验收对照：**[`../MAIN-FLOW-MATRIX.md`](../MAIN-FLOW-MATRIX.md)**（产品清单 ↔ 用例覆盖度）。  
+主流程验收对照：**[`../MAIN-FLOW-MATRIX.md`](../MAIN-FLOW-MATRIX.md)** · 实现目录 **`../main-flow/`**  
 完整 backlog 见：**[`../COVERAGE-BACKLOG.md`](../COVERAGE-BACKLOG.md)**（未覆盖 / 很浅 / 造数缺口 / 830 新功能）。
 
 摘要：

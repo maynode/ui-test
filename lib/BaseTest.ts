@@ -7,6 +7,7 @@ import { InteractionsPage } from '@pages/InteractionsPage';
 import { CourseListPage } from '@pages/CourseListPage';
 import { CourseDetailPage } from '@pages/CourseDetailPage';
 import { CertDetailPage } from '@pages/CertDetailPage';
+import { CertListPage } from '@pages/CertListPage';
 import { ExamPage } from '@pages/ExamPage';
 import { MyExamPage } from '@pages/MyExamPage';
 import { MyCertPage } from '@pages/MyCertPage';
@@ -27,6 +28,7 @@ const test = baseTest.extend<{
     courseListPage: CourseListPage;
     courseDetailPage: CourseDetailPage;
     certDetailPage: CertDetailPage;
+    certListPage: CertListPage;
     examPage: ExamPage;
     myExamPage: MyExamPage;
     myCertPage: MyCertPage;
@@ -63,6 +65,9 @@ const test = baseTest.extend<{
     },
     certDetailPage: async ({ page }, use) => {
         await use(new CertDetailPage(page));
+    },
+    certListPage: async ({ page }, use) => {
+        await use(new CertListPage(page));
     },
     examPage: async ({ page }, use) => {
         await use(new ExamPage(page));

@@ -11,6 +11,8 @@ export class SeatsManagePage {
     readonly breadcrumbTeamLink: Locator;
     readonly assignMemberBtn: Locator;
     readonly seatsHeader: Locator;
+    readonly assignDialog: Locator;
+    readonly assignDialogTitle: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -18,10 +20,17 @@ export class SeatsManagePage {
         this.breadcrumbTeamLink = page.locator('.seats-breadcrumb').getByText('团队服务');
         this.assignMemberBtn = page.getByRole('button', { name: '分配成员' });
         this.seatsHeader = page.locator('.seats-header');
+        this.assignDialog = page.locator('.seats-allocate');
+        this.assignDialogTitle = page.getByText(/分配成员/);
     }
 
     async waitForLoad() {
         await this.container.waitFor({ state: 'visible' });
         await this.seatsHeader.waitFor({ state: 'visible' });
+    }
+
+    async openAssignMemberDialog() {
+        await this.assignMemberBtn.click();
+        await this.assignDialog.waitFor({ state: 'visible' });
     }
 }

@@ -1,6 +1,7 @@
 # E2E 覆盖缺口 backlog
 
 > 记录当前 **未覆盖** 或 **覆盖很浅** 项，供后续迭代。  
+> **主流程 MF-* 套件**：[`main-flow/README.md`](main-flow/README.md)（20 项，`pnpm run test:main-flow`）。  
 > 已覆盖清单见 `tc-platform/README.md`「当前用例清单」。  
 > **主流程验收对照**见 [`MAIN-FLOW-MATRIX.md`](MAIN-FLOW-MATRIX.md)。  
 > 造数/账号前置见 `testData/seed-p2-matrix.md`。

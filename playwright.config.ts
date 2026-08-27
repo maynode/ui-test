@@ -184,6 +184,26 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
+      name: `TC-MainFlow`,
+      testDir: `./tests/main-flow`,
+      use: {
+        browserName: `chromium`,
+        channel: `chrome`,
+        baseURL: testConfig[currentEnvironment],
+        headless: isCI,
+        viewport: { width: 1500, height: 730 },
+        ignoreHTTPSErrors,
+        acceptDownloads: true,
+        screenshot: `only-on-failure`,
+        video: `retain-on-failure`,
+        trace: `retain-on-failure`,
+        ...(tcUserAuthState ? { storageState: tcUserAuthState } : {}),
+        launchOptions: {
+          slowMo: 0
+        }
+      },
+    },
+    {
       name: `TC-Platform`,
       testDir: `./tests/tc-platform`,
       use: {
