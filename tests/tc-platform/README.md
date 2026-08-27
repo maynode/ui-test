@@ -172,6 +172,7 @@ P2 人工前置见 `../testData/seed-p2-matrix.md`。Admin 说明见 `tests/tc-a
 
 ## 待补（后续加）
 
+主流程验收对照：**[`../MAIN-FLOW-MATRIX.md`](../MAIN-FLOW-MATRIX.md)**（产品清单 ↔ 用例覆盖度）。  
 完整 backlog 见：**[`../COVERAGE-BACKLOG.md`](../COVERAGE-BACKLOG.md)**（未覆盖 / 很浅 / 造数缺口 / 830 新功能）。
 
 摘要：

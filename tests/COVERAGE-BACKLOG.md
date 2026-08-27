@@ -2,6 +2,7 @@
 
 > 记录当前 **未覆盖** 或 **覆盖很浅** 项，供后续迭代。  
 > 已覆盖清单见 `tc-platform/README.md`「当前用例清单」。  
+> **主流程验收对照**见 [`MAIN-FLOW-MATRIX.md`](MAIN-FLOW-MATRIX.md)。  
 > 造数/账号前置见 `testData/seed-p2-matrix.md`。
 
 **统计基准（2026-08-27）**：Website 20 条（8 Smoke + 11 Regression + 1 Destructive）；Admin Seed 5 条。
