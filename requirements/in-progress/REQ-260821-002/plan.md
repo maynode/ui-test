@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- 仅改 `ui-test`；不改 admin 业务包
+- 仅改 `etcert-e2e`；不改 admin 业务包
 - 无本地账号时用例 `test.skip`，不虚构通过
 - 造数产物只写 `tests/testData/generated/catalog.json`（gitignore）
 - 需求文档不写领域 skill 名

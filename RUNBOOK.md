@@ -4,7 +4,7 @@
 
 ## 0. 前置条件（只需检查一次）
 
-- 已在 `ui-test` 目录执行过 `pnpm install`
+- 已在 `etcert-e2e` 目录执行过 `pnpm install`
 - 已安装 Playwright 浏览器：`pnpm exec playwright install`
 - 账号文件存在：`accounts.local.json`
 
@@ -14,7 +14,7 @@
 ## 1. 打开终端并进入项目目录
 
 ```powershell
-cd d:\CERT-ALL-CODES\ui-test
+cd d:\CERT-ALL-CODES\etcert-e2e
 ```
 
 ## 2. 选环境参数（直接跟在命令后）
@@ -80,7 +80,7 @@ pnpm run test:tc-platform:destructive --ENV=tcTest
 ## 一键记忆版（最常用三条）
 
 ```powershell
-cd d:\CERT-ALL-CODES\ui-test
+cd d:\CERT-ALL-CODES\etcert-e2e
 pnpm run test:tc-admin:seed --ENV=tcTest
 pnpm run test:tc-platform:smoke --ENV=tcTest
 pnpm exec playwright show-report html-report/tcTest

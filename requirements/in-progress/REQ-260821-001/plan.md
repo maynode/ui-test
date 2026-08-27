@@ -2,9 +2,9 @@
 
 > **For agentic workers:** Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 在 `ui-test` 内建立「后台 Admin UI 自动造数 → 写出 Catalog → 前台 Website 用例消费验证」的可扩展管线，首切片打通「用户授权」闭环。
+**Goal:** 在 `etcert-e2e` 内建立「后台 Admin UI 自动造数 → 写出 Catalog → 前台 Website 用例消费验证」的可扩展管线，首切片打通「用户授权」闭环。
 
-**Architecture:** 全部落在 `ui-test`（Playwright + Page Object），不引入 goldpath-e2e / Midscene。拆成三层：`admin`（等保级造数操作）、`catalog`（造数产物契约）、`website`（已有 tc-platform 验证用例）。新增 Playwright project `TC-Admin`（baseURL = etcert-admin），与现有 `TC-Platform`（website）分离。造数用例 `@Seed` 可独立跑，也可在验证前按依赖序执行；产物写入 `tests/testData/generated/catalog.json`（gitignore），静态 `courses.json` / `certs.json` 改为优先读 catalog、否则回退占位。业务依赖按 DAG 推进，禁止跨层硬编码 ID。
+**Architecture:** 全部落在 `etcert-e2e`（Playwright + Page Object），不引入 goldpath-e2e / Midscene。拆成三层：`admin`（等保级造数操作）、`catalog`（造数产物契约）、`website`（已有 tc-platform 验证用例）。新增 Playwright project `TC-Admin`（baseURL = etcert-admin），与现有 `TC-Platform`（website）分离。造数用例 `@Seed` 可独立跑，也可在验证前按依赖序执行；产物写入 `tests/testData/generated/catalog.json`（gitignore），静态 `courses.json` / `certs.json` 改为优先读 catalog、否则回退占位。业务依赖按 DAG 推进，禁止跨层硬编码 ID。
 
 **Tech Stack:** Playwright Test、现有 `lib/TcAuth` OAuth、Page Object（`pageFactory/pageRepository`）、JSON catalog、`accounts.local.json` 多角色。
 
@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- 所有新代码只进 `D:\CERT-ALL-CODES\ui-test`，可对照 `goldpath-e2e` 思路，禁止把 flow 迁进 goldpath 或反过来依赖它运行
+- 所有新代码只进 `D:\CERT-ALL-CODES\etcert-e2e`，可对照 `goldpath-e2e` 思路，禁止把 flow 迁进 goldpath 或反过来依赖它运行
 - Admin 与 Website 分 project / baseURL：`/etcert-admin/` vs `/etcert/`
 - 造数必须可幂等或带唯一前缀（时间戳 / runId），避免污染共享环境时无法识别
 - 账号密钥只来自 `accounts.local.json`（已 gitignore），不提交真实密码
@@ -97,7 +97,7 @@
 ## 页面结构（测试工程视角）
 
 ```text
-ui-test/
+etcert-e2e/
   lib/
     TcAuth.ts              # 扩展：admin 登录 etcert-admin OAuth
     tcAdminConfig.ts       # admin baseURL / catalog 路径
@@ -349,7 +349,7 @@ git add lib/catalog.ts lib/tcAdminConfig.ts tests/testData/generated/.gitkeep .g
 
 - [ ] **Step 1: 增加 loginAsAdmin**
 
-参考 `goldpath-e2e/helpers/admin.ts` 行为，迁入 ui-test 风格：
+参考 `goldpath-e2e/helpers/admin.ts` 行为，迁入 etcert-e2e 风格：
 
 ```typescript
 // 在 lib/TcAuth.ts 追加
