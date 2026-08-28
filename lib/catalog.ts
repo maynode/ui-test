@@ -12,6 +12,7 @@ export type CatalogAuth = {
 export type CatalogEntity = {
     id: string;
     name?: string;
+    productName?: string;
     createdAt?: string;
     [key: string]: unknown;
 };

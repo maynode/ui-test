@@ -1,11 +1,12 @@
 import { Page, expect } from '@playwright/test';
-import { adminPageUrl } from '@lib/tcAdminConfig';
 import {
     fillFormInput,
+    pickFirstCascaderOption,
     pickFirstSelectOption,
     readFirstRowCell,
     readRowCellByName,
 } from './adminUi';
+import { adminCourseRoute, gotoAdminHashPage } from './adminNavigate';
 
 export class CourseManagePage {
     constructor(private page: Page) {}
@@ -17,8 +18,10 @@ export class CourseManagePage {
     }
 
     async goto(): Promise<void> {
-        await this.page.goto(adminPageUrl('/system/course'), { waitUntil: 'domcontentloaded' });
-        await this.page.getByRole('button', { name: '新增课程' }).waitFor({ state: 'visible', timeout: 30_000 });
+        const ready = this.page.getByRole('button', { name: '新增课程' });
+        await gotoAdminHashPage(this.page, adminCourseRoute(), ready, {
+            menuPath: ['课程中心', '课程管理'],
+        });
     }
 
     async tableHasRows(): Promise<boolean> {
@@ -46,7 +49,7 @@ export class CourseManagePage {
     /** 必填：分类 / 标签 / 付费 / 语言 / 名称；选项取下拉第一项 */
     async fillRequired(courseName: string): Promise<void> {
         const d = this.dialog();
-        await pickFirstSelectOption(d, this.page, '课程分类');
+        await pickFirstCascaderOption(d, this.page, '课程分类');
         await pickFirstSelectOption(d, this.page, '付费类型');
         await pickFirstSelectOption(d, this.page, '资源语言');
         await pickFirstSelectOption(d, this.page, '课程标签');
@@ -91,6 +94,10 @@ export class CourseManagePage {
      */
     async ensureCourseId(uniqueName: string): Promise<{ id: string; name: string; created: boolean }> {
         await this.goto();
+        if (await this.tableHasRows()) {
+            const harvested = await this.harvestFirstCourse();
+            return { ...harvested, created: false };
+        }
         try {
             await this.openCreate();
             await this.fillRequired(uniqueName);

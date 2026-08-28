@@ -1,5 +1,4 @@
 import { Page, expect } from '@playwright/test';
-import { adminPageUrl } from '@lib/tcAdminConfig';
 import {
     clickRadioByText,
     fillFormInput,
@@ -8,6 +7,7 @@ import {
     readRowCellByName,
     setInputNumber,
 } from './adminUi';
+import { adminExamRoute, gotoAdminHashPage } from './adminNavigate';
 
 export class ExamListPage {
     constructor(private page: Page) {}
@@ -21,8 +21,10 @@ export class ExamListPage {
     }
 
     async goto(): Promise<void> {
-        await this.page.goto(adminPageUrl('/exam/list'), { waitUntil: 'domcontentloaded' });
-        await this.page.getByRole('button', { name: '新增考试' }).waitFor({ state: 'visible', timeout: 30_000 });
+        const ready = this.page.getByRole('button', { name: '新增考试' });
+        await gotoAdminHashPage(this.page, adminExamRoute(), ready, {
+            menuPath: ['考试中心', '随时考试'],
+        });
     }
 
     async tableHasRows(): Promise<boolean> {
@@ -100,6 +102,10 @@ export class ExamListPage {
      */
     async ensureExamId(uniqueName: string): Promise<{ id: string; name: string; created: boolean }> {
         await this.goto();
+        if (await this.tableHasRows()) {
+            const harvested = await this.harvestFirstExam();
+            return { ...harvested, created: false };
+        }
         try {
             await this.openCreate();
             await this.fillBasic(uniqueName);

@@ -17,13 +17,15 @@ test.describe('Admin Seed 产品认证资源', () => {
 
     test('SEED-CERT-RES-001 绑定或收编认证资源写入 catalog', { tag: '@Seed' }, async ({ page }) => {
         const productRes = new ProductResPage(page);
-        const { id, name } = await productRes.ensureCertResId();
+        const { id, name, productName } = await productRes.ensureCertResId();
         expect(id.trim().length).toBeGreaterThan(0);
+        expect(name).not.toMatch(/课程订阅/);
 
         appendCert(
             {
                 id: id.trim(),
                 name,
+                productName,
                 createdAt: new Date().toISOString(),
             },
             seedRunId(),

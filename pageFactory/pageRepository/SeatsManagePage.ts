@@ -21,7 +21,7 @@ export class SeatsManagePage {
         this.assignMemberBtn = page.getByRole('button', { name: '分配成员' });
         this.seatsHeader = page.locator('.seats-header');
         this.assignDialog = page.locator('.seats-allocate');
-        this.assignDialogTitle = page.getByText(/分配成员/);
+        this.assignDialogTitle = page.getByRole('heading', { name: /分配成员/ });
     }
 
     async waitForLoad() {

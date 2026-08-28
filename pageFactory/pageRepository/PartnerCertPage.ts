@@ -1,4 +1,8 @@
 import { BrowserContext, Page, Locator } from '@playwright/test';
+import type { AccountRole } from '@lib/loadAccounts';
+import { waitForWebsiteAuthSettled } from '@lib/websiteSession';
+import { gotoWebsitePage } from '@lib/websiteNavigate';
+import { dismissBlockingWebsiteDialogs } from '@lib/websiteDialog';
 
 /**
  * 伙伴认证页 Page Object
@@ -28,9 +32,10 @@ export class PartnerCertPage {
         this.stageTitles = page.locator('.partner-cert-course .stage__title');
     }
 
-    async goto() {
-        await this.page.goto('/partnerCert');
+    async goto(role: AccountRole = 'user') {
+        await gotoWebsitePage(this.page, '/partnerCert', role);
         await this.container.waitFor({ state: 'visible' });
+        await dismissBlockingWebsiteDialogs(this.page);
     }
 
     async getSectionCount() {
@@ -58,18 +63,24 @@ export class PartnerCertPage {
     }
 
     async openFirstStudyInNewPage(context: BrowserContext) {
+        await dismissBlockingWebsiteDialogs(this.page);
         const popupPromise = context.waitForEvent('page');
         await this.studyBtns.first().click();
         const popup = await popupPromise;
         await popup.waitForLoadState('domcontentloaded');
+        await waitForWebsiteAuthSettled(popup);
+        await dismissBlockingWebsiteDialogs(popup);
         return popup;
     }
 
     async openFirstGoExamInNewPage(context: BrowserContext) {
+        await dismissBlockingWebsiteDialogs(this.page);
         const popupPromise = context.waitForEvent('page');
         await this.goExamBtns.first().click();
         const popup = await popupPromise;
         await popup.waitForLoadState('domcontentloaded');
+        await waitForWebsiteAuthSettled(popup);
+        await dismissBlockingWebsiteDialogs(popup);
         return popup;
     }
 }

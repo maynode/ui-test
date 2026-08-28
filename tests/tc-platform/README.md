@@ -46,8 +46,8 @@ Copy-Item accounts.example.json accounts.local.json
 
 | `ENV` | 地址来源（`testConfig.ts`） |
 |-------|------------------------------|
-| `tcQa` | 开发测试站 `https://dev.edu-test.zwsoft.cn` |
-| `tcTest` | 测试环境 [`https://edu-test.zwsoft.cn`](https://edu-test.zwsoft.cn/) |
+| `tcQa` | 开发测试站 `https://dev.edu-test.zwsoft.cn/etcert/` |
+| `tcTest` | 测试环境 [`https://edu-test.zwsoft.cn/etcert/`](https://edu-test.zwsoft.cn/etcert/) |
 | `tcDev` | 本地 `http://localhost:5173` |
 | `tcGray` | 预发占位 |
 

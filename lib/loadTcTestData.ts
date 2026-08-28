@@ -62,6 +62,12 @@ export function getCertId(): string | undefined {
     return id || undefined;
 }
 
+export function getCertName(): string | undefined {
+    const catalog = loadCatalog();
+    const name = catalog?.certs?.[0]?.name?.trim();
+    return name || undefined;
+}
+
 export function getCourseId(): string | undefined {
     const id = loadCoursesJson().firstCourse?.id?.trim();
     return id || undefined;

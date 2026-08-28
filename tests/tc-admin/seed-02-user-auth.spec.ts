@@ -3,6 +3,8 @@ import { UserAuthPage } from '@pages/admin/UserAuthPage';
 import { appendAuth, loadCatalog } from '@lib/catalog';
 import { getAccount, hasAccount } from '@lib/loadAccounts';
 import { tcAuthConfig } from '@lib/tcAuthConfig';
+import { latestCatalogCert } from '@lib/seedConfig';
+import { seedEnv, seedRunId } from '@pages/admin/adminUi';
 
 const auth = tcAuthConfig('admin');
 
@@ -25,6 +27,9 @@ test.describe('Admin Seed 用户授权', () => {
     });
 
     test('SEED-AUTH-001 批量用户授权并写入 catalog', { tag: '@Seed' }, async ({ page }) => {
+        const seedCert = latestCatalogCert();
+        test.skip(!seedCert?.productName, '请先跑 SEED-CERT-RES-001 写入 certs[0].productName');
+
         const userAuth = new UserAuthPage(page);
         const account = getAccount('user').username;
         const start = new Date();
@@ -34,13 +39,12 @@ test.describe('Admin Seed 用户授权', () => {
 
         await userAuth.goto();
         await userAuth.openBatchDialog();
-        const productName = await userAuth.pickFirstProduct();
+        const productName = await userAuth.pickProductByName(seedCert!.productName!);
         await userAuth.fillAccount(account);
         await userAuth.fillDateTime('授权开始时间', fmt(start));
         await userAuth.fillDateTime('授权结束时间', fmt(end));
         await userAuth.confirm();
 
-        const runId = new Date().toISOString().replace(/[:.]/g, '-');
         appendAuth(
             {
                 account,
@@ -49,8 +53,8 @@ test.describe('Admin Seed 用户授权', () => {
                 end: fmt(end),
                 createdAt: new Date().toISOString(),
             },
-            runId,
-            process.env.ENV || 'tcQa',
+            seedRunId(),
+            seedEnv(),
         );
         expect(loadCatalog()?.auth.length).toBeGreaterThan(0);
     });

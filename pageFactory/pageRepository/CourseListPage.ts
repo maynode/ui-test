@@ -1,4 +1,5 @@
 import { Page, Locator } from '@playwright/test';
+import { gotoWebsitePage, gotoWebsitePageWithoutLogin } from '@lib/websiteNavigate';
 
 /**
  * 课程入口页 Page Object
@@ -15,13 +16,39 @@ export class CourseListPage {
         this.page = page;
         this.container = page.locator('.course-detail-page');
         this.ctaButton = page.getByRole('button', { name: /开始学习|继续学习/ });
-        this.favoriteButton = page.locator('.course-detail-page__favorite');
+        this.favoriteButton = page.getByRole('button', { name: /^收藏|已收藏$/ });
     }
 
-    /** 导航到课程页（无 courseId 时使用平台默认课程） */
+    private courseRoute(courseId?: string) {
+        return courseId ? `/course?courseId=${courseId}` : '/course';
+    }
+
+    /** 导航到课程页（无 courseId 时使用平台默认课程）；会先登录并确保处于详情页模式 */
     async goto(courseId?: string) {
-        const url = courseId ? `/course?courseId=${courseId}` : '/course';
-        await this.page.goto(url);
+        await gotoWebsitePage(this.page, this.courseRoute(courseId));
+        await this.ensureDetailMode();
+    }
+
+    async ensureDetailMode() {
+        const backBtn = this.page.getByRole('button', { name: '返回课程详情' });
+        try {
+            await Promise.race([
+                this.container.waitFor({ state: 'visible', timeout: 8000 }),
+                backBtn.waitFor({ state: 'visible', timeout: 8000 }),
+            ]);
+        } catch {
+            // ignore
+        }
+
+        if (await backBtn.isVisible().catch(() => false)) {
+            await backBtn.click();
+        }
+        await this.container.waitFor({ state: 'visible', timeout: 15_000 });
+    }
+
+    /** 未登录场景直进课程页（如 TC-AUTH-002），不触发 OAuth */
+    async gotoWithoutLogin(courseId?: string) {
+        await gotoWebsitePageWithoutLogin(this.page, this.courseRoute(courseId));
         await this.container.waitFor({ state: 'visible' });
     }
 

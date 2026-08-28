@@ -14,11 +14,11 @@ export const testConfig = {
     dbName: ``,
 
     // === 培训认证平台 (tc-platform) ===
-    // 环境地址：根据 ENV 值选择对应地址
-    tcQa: `https://dev.edu-test.zwsoft.cn`,       // 开发测试站
-    tcTest: `https://edu-test.zwsoft.cn`,         // 测试环境
-    tcDev: `http://localhost:5173`,               // 本地开发环境
-    tcGray: `https://gray-cert.example.com`,      // 预发布环境（占位）
+    // Website baseURL 须含 VITE_PUBLIC_PATH（/etcert/）；PO 内路径如 /cert/list 会拼在其后
+    tcQa: `https://dev.edu-test.zwsoft.cn/etcert/`,       // 开发测试站
+    tcTest: `https://edu-test.zwsoft.cn/etcert/`,         // 测试环境
+    tcDev: `http://localhost:5173/etcert/`,               // 本地开发（与 website vite base 一致）
+    tcGray: `https://gray-cert.example.com/etcert/`,      // 预发布环境（占位）
 
     // 多角色账号：仅占位兜底。真实账号请写 accounts.local.json（见 tests/tc-platform/README.md）
     // loadAccounts 会忽略 example.com / 假 AES 前缀；勿把真密码提交进本文件

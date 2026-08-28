@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { chromium, type Page } from '@playwright/test';
+import { chromium, expect, type Page } from '@playwright/test';
 import { getAccount, hasAccount, type AccountRole } from './loadAccounts';
 import { adminBaseURL as resolveAdminBaseURL } from './tcAdminConfig';
 
@@ -24,10 +24,9 @@ export function getAuthStatePath(role: AuthStateKey): string {
     return AUTH_FILES[role];
 }
 
-async function fillZwsoftAccountLogin(page: Page, role: AccountRole): Promise<void> {
+async function submitZwsoftAccountLogin(page: Page, role: AccountRole): Promise<void> {
     const { username, password } = getAccount(role);
 
-    await page.waitForURL(/testaccounts\.zwsoft\.cn/, { timeout: 60_000 });
     await page.locator('#phoneInput').fill(username);
     await page.locator('#passwordInput').fill(password);
 
@@ -37,6 +36,20 @@ async function fillZwsoftAccountLogin(page: Page, role: AccountRole): Promise<vo
     }
 
     await page.getByRole('link', { name: /登\s*录/ }).click();
+}
+
+async function fillZwsoftAccountLogin(page: Page, role: AccountRole): Promise<void> {
+    await page.waitForURL(/testaccounts\.zwsoft\.cn/, { timeout: 60_000 });
+    await submitZwsoftAccountLogin(page, role);
+}
+
+/** 已离开 OAuth 中间页并进入后台（侧栏或「新增授权」可见） */
+export async function waitForAdminLoggedIn(page: Page): Promise<void> {
+    await expect(page.getByRole('button', { name: '授权登录' })).toBeHidden({ timeout: 90_000 });
+    await Promise.race([
+        page.getByRole('button', { name: '新增授权' }).waitFor({ state: 'visible', timeout: 60_000 }),
+        page.getByRole('menubar').first().waitFor({ state: 'visible', timeout: 60_000 }),
+    ]);
 }
 
 function normalizeAdminBase(adminBase: string): string {
@@ -73,24 +86,76 @@ export async function loginAsAdmin(page: Page, adminBase: string): Promise<void>
     }
 
     await fillZwsoftAccountLogin(page, 'admin');
-    await page.waitForURL(/etcert-admin/, { timeout: 90_000 });
-    await page.waitForLoadState('networkidle');
+    await waitForAdminLoggedIn(page);
+}
+
+/**
+ * 已在 OAuth 中间页：点「授权登录」→ testaccounts 填表 → 等待真正进入后台。
+ */
+export async function completeAdminOAuthLogin(page: Page): Promise<void> {
+    const oauthBtn = page.getByRole('button', { name: '授权登录' });
+    if (await oauthBtn.isVisible().catch(() => false)) {
+        await oauthBtn.click();
+        await page.waitForURL(/testaccounts\.zwsoft\.cn/, { timeout: 60_000 }).catch(() => undefined);
+    }
+    if (page.url().includes('testaccounts.zwsoft.cn')) {
+        await submitZwsoftAccountLogin(page, 'admin');
+    }
+    await waitForAdminLoggedIn(page);
+}
+
+/** storageState 过期、落到 OAuth 页时重登 */
+export async function reloginAdminSession(page: Page, _adminBase: string): Promise<void> {
+    const oauthBtn = page.getByRole('button', { name: '授权登录' });
+    if (!(await oauthBtn.isVisible().catch(() => false))) {
+        return;
+    }
+    await completeAdminOAuthLogin(page);
 }
 
 /** OAuth 登录：首页「注册/登录」→ testaccounts.zwsoft.cn → 回跳平台 */
 export async function loginAs(page: Page, baseURL: string, role: AccountRole = 'user'): Promise<void> {
-    await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
-    await page.getByRole('button', { name: '注册/登录' }).click();
-    await fillZwsoftAccountLogin(page, role);
-
     const hostPattern = new URL(baseURL).host.replace(/\./g, '\\.');
-    await page.waitForURL(new RegExp(hostPattern), { timeout: 90_000 });
-    await page.waitForLoadState('networkidle');
-
+    const onPlatform = new RegExp(hostPattern);
     const loginBtn = page.getByRole('button', { name: '注册/登录' });
-    if (await loginBtn.isVisible().catch(() => false)) {
-        throw new Error(`Login failed for role "${role}": header still shows 注册/登录`);
+
+    if (!onPlatform.test(page.url())) {
+        await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
     }
+
+    if (!(await loginBtn.isVisible().catch(() => false))) {
+        return;
+    }
+
+    // authStore 可能仍在从 cookie 恢复，按钮会短暂 is-loading / disabled
+    await expect(loginBtn).not.toHaveClass(/is-loading/, { timeout: 60_000 });
+    await expect(loginBtn).toBeEnabled({ timeout: 15_000 });
+
+    await loginBtn.click();
+
+    // 必须等 testaccounts；勿与 onPlatform race（起始 URL 已在平台上会误判跳过填表）
+    const onAccounts = await page
+        .waitForURL(/testaccounts\.zwsoft\.cn/, { timeout: 60_000 })
+        .then(() => true)
+        .catch(() => false);
+
+    if (onAccounts) {
+        await submitZwsoftAccountLogin(page, role);
+    } else {
+        console.warn(
+            `[tc-auth] role "${role}": did not reach testaccounts within 60s; assuming SSO redirect, waiting for header`,
+        );
+    }
+
+    await page.waitForURL(onPlatform, { timeout: 90_000 });
+    await page.waitForLoadState('domcontentloaded');
+
+    await expect(loginBtn).toBeHidden({ timeout: 90_000 }).catch(() => {
+        throw new Error(
+            `Login failed for role "${role}": header still shows 注册/登录. ` +
+                'Check accounts.local.json username/password and that the account can log in on the target ENV.',
+        );
+    });
 }
 
 async function saveAuthState(

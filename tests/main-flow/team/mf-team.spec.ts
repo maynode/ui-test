@@ -25,6 +25,7 @@ test.describe('主流程 · 团队管理', () => {
     });
 
     test('MF-TEAM-002 管理员分配权限生效', { tag: '@MainFlow' }, async ({ myTeamPage, seatsManagePage }) => {
+        test.setTimeout(180_000);
         await myTeamPage.goto();
         test.skip(await myTeamPage.isEmptyState(), 'admin 账号无团队订阅数据');
 

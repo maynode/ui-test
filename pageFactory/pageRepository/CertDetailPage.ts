@@ -1,4 +1,9 @@
 import { Page, Locator, expect } from '@playwright/test';
+import type { BrowserContext } from '@playwright/test';
+import { assertWebsiteLoggedIn } from '@lib/websiteSession';
+import { confirmZwDialog, confirmZwDialogIfVisible } from '@lib/websiteDialog';
+import { EXAM_ENTRY_URL, waitForWebsitePopupUrl } from '@lib/websitePopup';
+import { gotoWebsitePage } from '@lib/websiteNavigate';
 
 export type CertExamUiState =
     | 'start'
@@ -39,25 +44,47 @@ export class CertDetailPage {
     }
 
     async goto(certId: string) {
-        await this.page.goto(`/cert/detail?certId=${certId}`);
+        await gotoWebsitePage(this.page, `/cert/detail?certId=${certId}`);
         await this.container.waitFor({ state: 'visible' });
         await this.title.waitFor({ state: 'visible' });
     }
 
     async goToExamStep() {
-        await this.examStep.click();
-        await this.page.locator('.module-exam').waitFor({ state: 'visible' });
+        const examStepItem = this.page.locator('.step-nav__item').filter({ hasText: '在线考试' });
+        await examStepItem.waitFor({ state: 'visible', timeout: 30_000 });
+        await examStepItem.click();
+        await expect(this.examModule).toBeVisible({ timeout: 30_000 });
     }
 
     async clickSelfTest() {
+        await assertWebsiteLoggedIn(this.page);
         await this.learnStep.click();
         await this.page.locator('.module-learn').waitFor({ state: 'visible' });
         await this.selfTestBtn.click();
+        await confirmZwDialogIfVisible(this.page);
     }
 
     async clickExam() {
+        await assertWebsiteLoggedIn(this.page);
         await this.goToExamStep();
         await this.enterExamBtn.click();
+        await confirmZwDialog(this.page);
+    }
+
+    /** MF-CERT-004：点进考按钮并确认二次弹窗（新开标签页） */
+    async clickEnterExamWithConfirm(context: BrowserContext) {
+        return waitForWebsitePopupUrl(context, async () => {
+            await assertWebsiteLoggedIn(this.page);
+            await this.enterExamBtn.click();
+            await confirmZwDialog(this.page);
+        }, EXAM_ENTRY_URL);
+    }
+
+    /** 自测/进考类入口：新开标签页 */
+    async clickSelfTestInNewPage(context: BrowserContext) {
+        return waitForWebsitePopupUrl(context, async () => {
+            await this.clickSelfTest();
+        }, EXAM_ENTRY_URL);
     }
 
     async detectExamUiState(): Promise<CertExamUiState | null> {
@@ -119,10 +146,15 @@ export class CertDetailPage {
     }
 
     async clickEnterExamOrTriggerAuth() {
+        await assertWebsiteLoggedIn(this.page);
         await this.goToExamStep();
+        if (await this.partnerAuthDialog.isVisible().catch(() => false)) {
+            return;
+        }
         const enterVisible = await this.enterExamBtn.isVisible().catch(() => false);
         if (enterVisible) {
             await this.enterExamBtn.click();
+            await confirmZwDialogIfVisible(this.page);
         }
     }
 

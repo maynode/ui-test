@@ -1,4 +1,5 @@
 import { Page, Locator } from '@playwright/test';
+import { gotoWebsitePage } from '@lib/websiteNavigate';
 
 /**
  * 认证展示/目录页 Page Object
@@ -19,7 +20,7 @@ export class CertListPage {
     }
 
     async goto() {
-        await this.page.goto('/cert/list');
+        await gotoWebsitePage(this.page, '/cert/list');
         await this.container.waitFor({ state: 'visible' });
     }
 }

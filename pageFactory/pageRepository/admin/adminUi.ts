@@ -8,15 +8,55 @@ function formItem(scope: Scope, label: string) {
 
 /** 打开可见下拉并点选第一项可用 option，返回文案 */
 export async function pickFirstSelectOption(scope: Scope, page: Page, label: string): Promise<string> {
-    const select = formItem(scope, label).locator('.el-select').first();
+    await page.keyboard.press('Escape').catch(() => undefined);
+    const item = formItem(scope, label);
+    const select = item.locator('.el-select').first();
     await select.click();
-    const opt = page
+
+    const listboxOption = page.getByRole('listbox').last().getByRole('option').first();
+    const legacyOption = page
         .locator('.el-select-dropdown:visible .el-select-dropdown__item:not(.is-disabled)')
         .first();
+
+    const opt = (await listboxOption.isVisible().catch(() => false)) ? listboxOption : legacyOption;
     await opt.waitFor({ state: 'visible', timeout: 15_000 });
     const name = (await opt.innerText()).trim();
     await opt.click();
+    await page.keyboard.press('Escape').catch(() => undefined);
     return name;
+}
+
+/** 课程分类等 el-cascader：逐级点第一个可用节点直到叶子 */
+export async function pickFirstCascaderOption(scope: Scope, page: Page, label: string): Promise<string> {
+    const item = formItem(scope, label);
+    const cascader = item.locator('.el-cascader').first();
+    if (await cascader.count()) {
+        await cascader.click();
+    } else {
+        await item.getByRole('textbox').click();
+    }
+    const panel = page.locator('.el-cascader-panel:visible').first();
+    await panel.waitFor({ state: 'visible', timeout: 15_000 });
+
+    let picked = '';
+    for (let depth = 0; depth < 4; depth++) {
+        const panels = page.locator('.el-cascader-panel:visible');
+        const panelCount = await panels.count();
+        if (panelCount === 0) break;
+        const panelAt = panels.nth(panelCount - 1);
+        const node = panelAt.locator('.el-cascader-node:not(.is-disabled)').first();
+        await node.waitFor({ state: 'visible', timeout: 10_000 });
+        picked = (await node.innerText()).trim();
+        await node.click();
+        await page.waitForTimeout(200);
+        if (!(await page.locator('.el-cascader-panel:visible').first().isVisible().catch(() => false))) {
+            break;
+        }
+        if ((await panels.count()) <= panelCount) {
+            break;
+        }
+    }
+    return picked;
 }
 
 export async function fillFormInput(scope: Scope, label: string, value: string): Promise<void> {

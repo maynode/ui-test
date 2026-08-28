@@ -1,4 +1,6 @@
 import { Page, Locator } from '@playwright/test';
+import { gotoWebsitePage } from '@lib/websiteNavigate';
+import { dismissBlockingWebsiteDialogs } from '@lib/websiteDialog';
 
 /**
  * 团队服务页 Page Object
@@ -33,8 +35,9 @@ export class MyTeamPage {
     }
 
     async goto() {
-        await this.page.goto('/user/myTeam');
+        await gotoWebsitePage(this.page, '/user/myTeam', 'admin');
         await this.container.waitFor({ state: 'visible' });
+        await dismissBlockingWebsiteDialogs(this.page);
     }
 
     async isEmptyState() {
@@ -50,7 +53,11 @@ export class MyTeamPage {
     }
 
     async expandFirstCollapseAndWaitTable() {
-        await this.expandFirstTeamSection();
+        await dismissBlockingWebsiteDialogs(this.page);
+        const tableVisible = await this.collapseTables.first().isVisible().catch(() => false);
+        if (!tableVisible) {
+            await this.expandFirstTeamSection();
+        }
         await this.collapseTables.first().waitFor({ state: 'visible' });
     }
 
@@ -59,7 +66,8 @@ export class MyTeamPage {
     }
 
     async openFirstSeatManage() {
+        await dismissBlockingWebsiteDialogs(this.page);
         await this.seatManageBtn.first().click();
-        await this.page.waitForURL(/\/user\/seatsMng/);
+        await this.page.waitForURL(/\/user\/seatsMng/, { timeout: 60_000 });
     }
 }

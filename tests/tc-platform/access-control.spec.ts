@@ -2,7 +2,9 @@ import test from '@lib/BaseTest';
 import { expect } from '@playwright/test';
 import { getCourseId } from '@lib/loadTcTestData';
 import { tcAuthConfig } from '@lib/tcAuthConfig';
+import { websitePath } from '@lib/websitePath';
 import { CertDetailPage } from '@pages/CertDetailPage';
+import { CourseDetailPage } from '@pages/CourseDetailPage';
 
 const userAuth = tcAuthConfig('user');
 const courseId = getCourseId();
@@ -15,7 +17,7 @@ test.describe('访问拦截', () => {
 
     test('TC-AUTH-001 未登录访问个人中心重定向首页', { tag: '@Regression' }, async ({ page }) => {
         await test.step('访问我的考试页', async () => {
-            await page.goto('/user/myExam');
+            await page.goto(websitePath('/user/myExam'));
         });
 
         await test.step('验证被重定向离开个人中心', async () => {
@@ -24,13 +26,18 @@ test.describe('访问拦截', () => {
         });
     });
 
-    test('TC-AUTH-002 未登录点击开始学习弹出登录提示', { tag: '@Regression' }, async ({ page, courseListPage }) => {
-        await test.step('打开课程详情', async () => {
-            await courseListPage.goto(courseId);
+    test('TC-AUTH-002 未登录点击开始学习弹出登录提示', { tag: '@Regression' }, async ({
+        page,
+        courseListPage,
+        courseDetailPage,
+    }) => {
+        await test.step('打开课程详情（未登录）', async () => {
+            await courseListPage.gotoWithoutLogin(courseId);
+            await expect(page.getByRole('button', { name: '注册/登录' })).toBeVisible();
         });
 
-        await test.step('点击开始学习应出现登录确认框', async () => {
-            await courseListPage.ctaButton.click();
+        await test.step('点击收藏触发登录确认框', async () => {
+            await courseDetailPage.triggerLoginPromptFromDetail();
             await expect(page.locator('.zw-confirm')).toBeVisible();
             await expect(page.getByRole('button', { name: '去登录' })).toBeVisible();
         });
@@ -59,8 +66,9 @@ test.describe('非 partner 用户伙伴资源拦截', () => {
 
         await test.step('新标签打开伙伴课程并触发学习拦截', async () => {
             const coursePage = await partnerCertPage.openFirstStudyInNewPage(context);
-            const cta = coursePage.getByRole('button', { name: /开始学习|继续学习/ });
-            await cta.click();
+            const courseDetailPage = new CourseDetailPage(coursePage);
+            await coursePage.getByRole('button', { name: /开始学习|继续学习/ }).click();
+            await courseDetailPage.triggerPartnerAuthFromStudy();
             await expect(coursePage.locator('.zw-partner-auth-dialog')).toBeVisible();
             await expect(coursePage.getByText('非经销商伙伴，暂无权限访问该页面')).toBeVisible();
             await coursePage.close();

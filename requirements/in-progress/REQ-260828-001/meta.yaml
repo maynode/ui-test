@@ -1,0 +1,48 @@
+req_id: REQ-260828-001
+title: "主流程重构批次一：管理中心 E2E 闭环与旧团队用例下架"
+created: 2026-08-28
+phase: plan
+review_status: pending
+review_round: 0
+last_skill: writing-plans
+tasks:
+  - id: 1
+    desc: "新增管理中心导航工具与 MC 子集跑测脚本"
+    status: pending
+  - id: 2
+    desc: "新增管理中心布局 Page Object（侧栏/顶栏/入口）"
+    status: pending
+  - id: 3
+    desc: "接线 MF-MC-001 管理中心入口与布局"
+    status: pending
+  - id: 4
+    desc: "新增成员信息 Page Object"
+    status: pending
+  - id: 5
+    desc: "接线 MF-MC-002 成员信息列表与添加入口"
+    status: pending
+  - id: 6
+    desc: "新增坐席分配与名额管理 Page Object"
+    status: pending
+  - id: 7
+    desc: "接线 MF-MC-003 选择成员分配闭环与名额扣减断言"
+    status: pending
+  - id: 8
+    desc: "新增跨账号第二浏览器上下文工具"
+    status: pending
+  - id: 9
+    desc: "接线 MF-MC-004 学员端跨账号收权验证"
+    status: pending
+  - id: 10
+    desc: "新增报表分析 Page Object"
+    status: pending
+  - id: 11
+    desc: "接线 MF-MC-005 报表分析统计与明细表"
+    status: pending
+  - id: 12
+    desc: "下架旧团队服务用例与对应 Page Object"
+    status: pending
+  - id: 13
+    desc: "同步覆盖矩阵/前置说明/运行手册并跑一轮全量回归"
+    status: pending
+last_updated: 2026-08-28

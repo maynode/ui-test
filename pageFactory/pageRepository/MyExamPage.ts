@@ -1,4 +1,5 @@
 import { Page, Locator } from '@playwright/test';
+import { gotoWebsitePage } from '@lib/websiteNavigate';
 
 /**
  * 我的考试页 Page Object
@@ -19,7 +20,7 @@ export class MyExamPage {
     }
 
     async goto() {
-        await this.page.goto('/user/myExam');
+        await gotoWebsitePage(this.page, '/user/myExam');
         await this.container.waitFor({ state: 'visible' });
     }
 

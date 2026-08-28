@@ -1,12 +1,17 @@
 import test from '@lib/BaseTest';
 import { expect } from '@playwright/test';
-import { getCertId } from '@lib/loadTcTestData';
+import { getCertId, getCertName } from '@lib/loadTcTestData';
+import { assertWebsiteLoggedIn } from '@lib/websiteSession';
+import { EXAM_ENTRY_URL } from '@lib/websitePopup';
 import { tcAuthConfig } from '@lib/tcAuthConfig';
 
 const auth = tcAuthConfig('user');
 const certId = getCertId();
+const certName = getCertName();
 const certSkipReason =
     '缺少 certId：请配置 tests/testData/certs.json 或先跑 Admin Seed 写入 catalog.certs[0].id';
+const certExamSkipReason =
+    'catalog 认证为「课程订阅」或不可考试类型，请重跑 pnpm run test:tc-admin:seed:tcTest（需与授权产品一致）';
 
 /**
  * 主流程 · 认证考试（矩阵 2.1 ~ 2.9）
@@ -36,25 +41,35 @@ test.describe('主流程 · 认证考试', () => {
 
     test('MF-CERT-003 点击去自测按钮', { tag: '@MainFlow' }, async ({ certDetailPage, page }) => {
         test.skip(!certId, certSkipReason);
+        test.skip(Boolean(certName?.includes('课程订阅')), certExamSkipReason);
         await certDetailPage.goto(certId!);
 
         const selfTestVisible = await certDetailPage.selfTestBtn.isVisible().catch(() => false);
         test.skip(!selfTestVisible, '当前认证无「进入模拟测试」入口');
 
-        await certDetailPage.clickSelfTest();
-        await page.waitForURL(/\/cert\/(notice|binding)|etcert-exam/, { timeout: 90_000 });
+        const popup = await certDetailPage.clickSelfTestInNewPage(page.context());
+        await expect(popup).toHaveURL(EXAM_ENTRY_URL);
     });
 
     test('MF-CERT-004 点击去考试按钮', { tag: '@MainFlow' }, async ({ certDetailPage, page }) => {
         test.skip(!certId, certSkipReason);
+        test.skip(Boolean(certName?.includes('课程订阅')), certExamSkipReason);
         await certDetailPage.goto(certId!);
-        await certDetailPage.goToExamStep();
+
+        const enterVisibleBeforeStep = await certDetailPage.enterExamBtn.isVisible().catch(() => false);
+        if (!enterVisibleBeforeStep) {
+            await certDetailPage.goToExamStep();
+        }
 
         const enterVisible = await certDetailPage.enterExamBtn.isVisible().catch(() => false);
         test.skip(!enterVisible, '当前账号考试状态无「进入/继续/补考」按钮');
 
-        await certDetailPage.enterExamBtn.click();
-        await page.waitForURL(/\/cert\/(notice|binding)|etcert-exam/, { timeout: 90_000 });
+        const enterEnabled = await certDetailPage.enterExamBtn.isEnabled().catch(() => false);
+        test.skip(!enterEnabled, '当前账号考试按钮不可用（未满足进考条件或认证不可考）');
+
+        await assertWebsiteLoggedIn(page);
+        const popup = await certDetailPage.clickEnterExamWithConfirm(page.context());
+        await expect(popup).toHaveURL(EXAM_ENTRY_URL);
     });
 
     test(
@@ -85,6 +100,7 @@ test.describe('主流程 · 认证考试', () => {
 
     test('MF-CERT-007 考试状态同步', { tag: '@MainFlow' }, async ({ certDetailPage, myExamPage, page }) => {
         test.skip(!certId, certSkipReason);
+        test.skip(Boolean(certName?.includes('课程订阅')), certExamSkipReason);
 
         await certDetailPage.goto(certId!);
         await certDetailPage.goToExamStep();

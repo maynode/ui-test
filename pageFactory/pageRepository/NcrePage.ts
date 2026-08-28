@@ -1,4 +1,5 @@
 import { Page, Locator } from '@playwright/test';
+import { gotoWebsitePage } from '@lib/websiteNavigate';
 
 /**
  * NCRE 模块页 Page Object
@@ -25,7 +26,7 @@ export class NcrePage {
     }
 
     async goto() {
-        await this.page.goto('/ncreExam');
+        await gotoWebsitePage(this.page, '/ncreExam');
         await this.container.waitFor({ state: 'visible' });
         await this.studentPanel.waitFor({ state: 'visible' });
     }

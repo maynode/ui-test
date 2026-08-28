@@ -8,6 +8,10 @@ async function globalSetup(config: FullConfig): Promise<void> {
 
     const env = process.env.ENV || process.env.npm_config_ENV || '';
     if (env.startsWith('tc')) {
+        if (process.env.SKIP_TC_AUTH_SETUP === '1') {
+            console.log('[tc-auth] SKIP_TC_AUTH_SETUP=1, reusing existing .auth/* storageState');
+            return;
+        }
         const websiteBaseURL = config.projects.find(p => p.name === 'TC-Platform')?.use?.baseURL as string | undefined;
         if (!websiteBaseURL) {
             throw new Error('TC-Platform project baseURL is not configured.');

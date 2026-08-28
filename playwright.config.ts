@@ -11,7 +11,10 @@ const validEnvironments = [`qa`, `dev`, `qaApi`, `devApi`, `tcQa`, `tcTest`, `tc
 type TestEnvironment = typeof validEnvironments[number];
 
 if (!ENV || !validEnvironments.includes(ENV as TestEnvironment)) {
-  console.log(`Please provide a correct environment value after command like "--ENV=qa|dev|qaApi|devApi|tcQa|tcTest|tcDev|tcGray"`);
+  console.log(
+    `Please set ENV before running tests. PowerShell: $env:ENV="tcTest"; pnpm run test:tc-admin:seed:tcTest` +
+      `\nOr use :tcTest script suffix. Valid: qa|dev|qaApi|devApi|tcQa|tcTest|tcDev|tcGray`,
+  );
   process.exit();
 }
 
@@ -28,6 +31,10 @@ const ignoreHTTPSErrorsByEnvironment: Record<TestEnvironment, boolean> = {
   tcGray: true,
 };
 const ignoreHTTPSErrors = ignoreHTTPSErrorsByEnvironment[currentEnvironment];
+const stepScreenshotEnabled =
+  process.env.STEP_SCREENSHOT === '1' || process.env.STEP_SCREENSHOT === 'true';
+/** 用例级截图：STEP_SCREENSHOT=1 时每条用例结束也存一张（与 step attach 互补） */
+const screenshotMode = stepScreenshotEnabled ? 'on' : 'only-on-failure';
 const tcUserAuthState = fs.existsSync(getAuthStatePath('user')) ? getAuthStatePath('user') : undefined;
 const tcAdminAuthState = fs.existsSync(getAuthStatePath('admin')) ? getAuthStatePath('admin') : undefined;
 // Website 团队用例由 spec 内 tcWebsiteAdminAuthConfig 绑定 admin-website.json，不在此 project 默认注入
@@ -194,7 +201,7 @@ const config: PlaywrightTestConfig = {
         viewport: { width: 1500, height: 730 },
         ignoreHTTPSErrors,
         acceptDownloads: true,
-        screenshot: `only-on-failure`,
+        screenshot: screenshotMode,
         video: `retain-on-failure`,
         trace: `retain-on-failure`,
         ...(tcUserAuthState ? { storageState: tcUserAuthState } : {}),

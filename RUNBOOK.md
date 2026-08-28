@@ -2,8 +2,8 @@
 
 这份文档只回答一件事：**从 0 到出报告，按什么顺序跑**。
 
-> **产品主流程验收**（20 项清单）→ `pnpm run test:main-flow`（`tests/main-flow/`，见 [`tests/main-flow/README.md`](tests/main-flow/README.md)）  
-> **扩展回归 / 历史 Smoke** → `pnpm run test:tc-platform:smoke`
+> **产品主流程验收**（20 项）→ **[`tests/main-flow/RUNBOOK.md`](tests/main-flow/RUNBOOK.md)**（推荐）  
+> 扩展回归 / 历史 Smoke → `pnpm run test:tc-platform:smoke`
 
 ## 0. 前置条件（只需检查一次）
 
@@ -20,15 +20,26 @@
 cd d:\CERT-ALL-CODES\etcert-e2e
 ```
 
-## 2. 选环境参数（直接跟在命令后）
+## 2. 选环境参数
 
 可选值：`tcQa` / `tcTest` / `tcDev` / `tcGray`。  
 `ENV` 只决定站点地址，不决定账号。
 
+**PowerShell 不要用** `pnpm run xxx --ENV=tcTest`（会报 `unknown option '--ENV=tcTest'`）。
+
+```powershell
+# 推荐：脚本名带 :tcTest
+pnpm run test:tc-admin:seed:tcTest
+
+# 或先设变量
+$env:ENV = "tcTest"
+pnpm run test:tc-admin:seed
+```
+
 ## 3. 先跑 Admin Seed（造数）
 
 ```powershell
-pnpm run test:tc-admin:seed --ENV=tcTest
+pnpm run test:tc-admin:seed:tcTest
 ```
 
 作用：
@@ -40,7 +51,7 @@ pnpm run test:tc-admin:seed --ENV=tcTest
 ## 4. 跑主流程验收（推荐 · 产品清单 20 项）
 
 ```powershell
-pnpm run test:main-flow --ENV=tcTest
+pnpm run test:main-flow:tcTest
 ```
 
 范围：
@@ -51,13 +62,13 @@ pnpm run test:main-flow --ENV=tcTest
 破坏性主流程（交卷等，2 条）：
 
 ```powershell
-pnpm run test:main-flow:destructive --ENV=tcTest
+pnpm run test:main-flow:destructive:tcTest
 ```
 
 ## 5. 跑扩展 Smoke（可选 · tc-platform 历史门禁）
 
 ```powershell
-pnpm run test:tc-platform:smoke --ENV=tcTest
+pnpm run test:tc-platform:smoke:tcTest
 ```
 
 范围：
@@ -80,13 +91,15 @@ pnpm exec playwright show-report html-report/tcTest
 ### 7.1 tc-platform 全量（不含破坏性）
 
 ```powershell
-pnpm run test:tc-platform --ENV=tcTest
+$env:ENV = "tcTest"
+pnpm run test:tc-platform
 ```
 
 ### 7.2 tc-platform 破坏性（完整交卷等）
 
 ```powershell
-pnpm run test:tc-platform:destructive --ENV=tcTest
+$env:ENV = "tcTest"
+pnpm run test:tc-platform:destructive
 ```
 
 建议用专用账号跑 destructive。
@@ -101,7 +114,7 @@ pnpm run test:tc-platform:destructive --ENV=tcTest
 
 ```powershell
 cd d:\CERT-ALL-CODES\etcert-e2e
-pnpm run test:tc-admin:seed --ENV=tcTest
-pnpm run test:main-flow --ENV=tcTest
+pnpm run test:tc-admin:seed:tcTest
+pnpm run test:main-flow:tcTest
 pnpm exec playwright show-report html-report/tcTest
 ```
