@@ -11,10 +11,13 @@ import { CertListPage } from '@pages/CertListPage';
 import { ExamPage } from '@pages/ExamPage';
 import { MyExamPage } from '@pages/MyExamPage';
 import { MyCertPage } from '@pages/MyCertPage';
-import { MyTeamPage } from '@pages/MyTeamPage';
 import { NcrePage } from '@pages/NcrePage';
 import { PartnerCertPage } from '@pages/PartnerCertPage';
-import { SeatsManagePage } from '@pages/SeatsManagePage';
+import { ManageCenterPage } from '@pages/manageCenter/ManageCenterPage';
+import { ManageCenterMemberPage } from '@pages/manageCenter/ManageCenterMemberPage';
+import { ManageCenterSeatPage } from '@pages/manageCenter/ManageCenterSeatPage';
+import { ManageCenterSeatsManagePage } from '@pages/manageCenter/ManageCenterSeatsManagePage';
+import { ManageCenterReportPage } from '@pages/manageCenter/ManageCenterReportPage';
 import { WebActions } from '@lib/WebActions';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -32,10 +35,13 @@ const test = baseTest.extend<{
     examPage: ExamPage;
     myExamPage: MyExamPage;
     myCertPage: MyCertPage;
-    myTeamPage: MyTeamPage;
     ncrePage: NcrePage;
     partnerCertPage: PartnerCertPage;
-    seatsManagePage: SeatsManagePage;
+    manageCenterPage: ManageCenterPage;
+    manageCenterMemberPage: ManageCenterMemberPage;
+    manageCenterSeatPage: ManageCenterSeatPage;
+    manageCenterSeatsManagePage: ManageCenterSeatsManagePage;
+    manageCenterReportPage: ManageCenterReportPage;
     makeAxeBuilder: AxeBuilder;
     testInfo: TestInfo;
 }>({
@@ -78,17 +84,26 @@ const test = baseTest.extend<{
     myCertPage: async ({ page }, use) => {
         await use(new MyCertPage(page));
     },
-    myTeamPage: async ({ page }, use) => {
-        await use(new MyTeamPage(page));
-    },
     ncrePage: async ({ page }, use) => {
         await use(new NcrePage(page));
     },
     partnerCertPage: async ({ page }, use) => {
         await use(new PartnerCertPage(page));
     },
-    seatsManagePage: async ({ page }, use) => {
-        await use(new SeatsManagePage(page));
+    manageCenterPage: async ({ page }, use) => {
+        await use(new ManageCenterPage(page));
+    },
+    manageCenterMemberPage: async ({ page }, use) => {
+        await use(new ManageCenterMemberPage(page));
+    },
+    manageCenterSeatPage: async ({ page }, use) => {
+        await use(new ManageCenterSeatPage(page));
+    },
+    manageCenterSeatsManagePage: async ({ page }, use) => {
+        await use(new ManageCenterSeatsManagePage(page));
+    },
+    manageCenterReportPage: async ({ page }, use) => {
+        await use(new ManageCenterReportPage(page));
     },
     makeAxeBuilder: async ({ page }, use) => {
         await use(new AxeBuilder({ page })

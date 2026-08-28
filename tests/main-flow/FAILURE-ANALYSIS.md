@@ -37,7 +37,7 @@
 | 角色 | 账号 | 是否已配置 | 主流程用途 |
 |------|------|------------|------------|
 | **user** | `zrg_dev@163.com` | ✅ 已配置 | 课程、认证、NCRE、伙伴负向（MF-PARTNER-003） |
-| **admin** | `17585108040` | ✅ 已配置 | Seed 造数；团队 MF-TEAM-002（C 端 `admin-website.json`） |
+| **admin** | `17585108040` | ✅ 已配置 | Seed 造数；管理中心 MF-MC-*（C 端 `admin-website.json`） |
 | **partner** | `your-partner-phone-or-email`（占位） | ❌ 未配置 | MF-PARTNER-001/002 会 skip |
 
 密码见本地 `accounts.local.json`（**勿提交 git**）。也可用环境变量 `TC_USER_USERNAME` / `TC_USER_PASSWORD` 等覆盖。
@@ -47,7 +47,7 @@
 | 文件 | 角色 | 用于 |
 |------|------|------|
 | `.auth/user.json` | user | 大部分主流程 |
-| `.auth/admin-website.json` | admin（C 端） | MF-TEAM-002 |
+| `.auth/admin-website.json` | admin（C 端） | 管理中心 MF-MC-* |
 | `.auth/admin.json` | admin（后台） | Seed 专用，非主流程 |
 | `.auth/partner.json` | partner | 未生成（无有效 partner 账号） |
 

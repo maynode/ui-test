@@ -154,6 +154,51 @@ export class ExamPage {
         );
     }
 
+    /**
+     * 模拟测试须知：等待倒计时结束并勾选同意，点击开始模拟考试
+     */
+    async completeSelfTestNotice() {
+        await this.examNotice.waitFor({ state: 'visible', timeout: 60_000 });
+        if (await this.noticeCheckbox.isVisible().catch(() => false)) {
+            await this.noticeCheckbox.click();
+        } else {
+            const labelCheck = this.examNotice.getByText(/我已阅读/);
+            if (await labelCheck.isVisible().catch(() => false)) {
+                await this.examNotice.locator('.el-checkbox').first().click();
+            }
+        }
+        await expect(this.noticeStartBtn).toBeEnabled({ timeout: 30_000 });
+        await this.noticeStartBtn.click();
+    }
+
+    /**
+     * 连续作答客观题（最多尝试 answerCount 道）
+     */
+    async answerObjectiveQuestions(answerCount = 2) {
+        await this.waitForLoad();
+        let answered = 0;
+        for (let i = 0; i < 10 && answered < answerCount; i++) {
+            const count = await this.questionOptions.count();
+            if (count > 0) {
+                await this.questionOptions.first().click();
+                answered++;
+            }
+            if (answered < answerCount && (await this.nextQuestionBtn.isVisible().catch(() => false))) {
+                await this.nextQuestionBtn.click();
+                await this.page.waitForTimeout(500);
+            }
+        }
+    }
+
+    /**
+     * 确认交卷并断言提交成功界面
+     */
+    async submitAndAssertSuccess() {
+        await this.submitBtn.click();
+        await this.confirmSubmitBtn.click();
+        await expect(this.submitSuccess).toBeVisible({ timeout: 30_000 });
+    }
+
     async submitExam() {
         await this.submitBtn.click();
         await this.confirmSubmitBtn.click();

@@ -1,6 +1,6 @@
 # 主流程 E2E 跑测手册（SOP）
 
-> 产品「主要功能流程」20 项验收。用例目录：`tests/main-flow/`（`MF-*`）。  
+> 产品「主要功能流程」24 项验收。用例目录：`tests/main-flow/`（`MF-*`）。  
 > 覆盖对照：[`../MAIN-FLOW-MATRIX.md`](../MAIN-FLOW-MATRIX.md) · 用例索引：[`README.md`](README.md)
 
 ---
@@ -9,9 +9,10 @@
 
 | 套件 | 条数 | 命令 | 说明 |
 |------|------|------|------|
-| 主流程（日常） | 18 | `test:main-flow` | 不含交卷等破坏性 |
-| 主流程 + 每步截图 | 18 | `test:main-flow:screenshots` | HTML 报告 Attachments 可看每步图 |
+| 主流程（日常） | 22 | `test:main-flow` | 不含交卷等破坏性 |
+| 主流程 + 每步截图 | 22 | `test:main-flow:screenshots` | HTML 报告 Attachments 可看每步图 |
 | 破坏性主流程 | 2 | `test:main-flow:destructive` | MF-CERT-005/006 完整考试/交卷 |
+| 仅管理中心 | 5 | `test:main-flow:mc` | MF-MC-001~005，需 admin 有团队名额 |
 | Admin 造数 | 5 Seed | `test:tc-admin:seed` | **建议先跑**，写 catalog + 登录态 |
 
 Playwright project：**`TC-MainFlow`**（`playwright.config.ts`）。
@@ -42,7 +43,7 @@ Copy-Item accounts.example.json accounts.local.json
 | 角色 | 是否必须 | 用途 |
 |------|----------|------|
 | `user` | **必须** | 课程、认证、NCRE、伙伴权限负向 |
-| `admin` | **必须** | Seed 造数；团队 MF-TEAM-*（Website 登录态） |
+| `admin` | **必须** | Seed 造数；管理中心 MF-MC-*（Website 登录态） |
 | `partner` | 可选 | MF-PARTNER-001/002；缺则 skip |
 
 `user` 跑破坏性交卷（MF-CERT-005/006）时需 **已实名**。
@@ -85,7 +86,7 @@ cd d:\CERT-ALL-CODES\etcert-e2e
 # ① 造数 + 登录态
 pnpm run test:tc-admin:seed:tcTest
 
-# ② 主流程 18 条
+# ② 主流程 22 条
 pnpm run test:main-flow:tcTest
 
 # ③ 看报告
@@ -105,7 +106,7 @@ pnpm run test:main-flow:screenshots:tcTest
 pnpm exec playwright show-report html-report/tcTest
 ```
 
-报告里：点开用例 → **Attachments** → 按步骤名查看 PNG（目前 **课程 4 条** 已接 `stepWithScreenshot`）。
+报告里：点开用例 → **Attachments** → 按步骤名查看 PNG（目前 **课程 6 条** 已接 `stepWithScreenshot`）。
 
 ### 5.3 完整考试 / 交卷（破坏性，单独跑）
 
@@ -147,17 +148,17 @@ pnpm exec playwright test --project=TC-MainFlow --grep @MainFlow --ui
 
 ---
 
-## 七、20 条用例一览
+## 七、24 条用例一览
 
 | 模块 | ID | 标题 |
 |------|-----|------|
-| 课程 | MF-COURSE-001~004 | 课程页 / 详情 / 视频 / 文档 |
+| 课程 | MF-COURSE-001~006 | 课程页 / 详情 / 视频播控 / 文档 / 选节连播 / VIP试看 |
 | 认证 | MF-CERT-001~009 | 认证列表~证书（005/006 为 Destructive） |
-| 团队 | MF-TEAM-001~003 | 购买同步 / 分配 / 占位 |
+| 管理中心 | MF-MC-001~005 | 入口布局 / 成员 / 分配闭环 / 跨账号收权 / 报表 |
 | NCRE | MF-NCRE-001 | 模块 + 考点 Tab |
 | 伙伴 | MF-PARTNER-001~003 | 模块 / 课程详情 / 权限 |
 
-文件路径：`tests/main-flow/{course|cert|team|ncre|partner}/mf-*.spec.ts`
+文件路径：`tests/main-flow/{course|cert|manage-center|ncre|partner}/mf-*.spec.ts`
 
 ---
 
@@ -173,9 +174,12 @@ pnpm exec playwright test --project=TC-MainFlow --grep @MainFlow --ui
 
 | 用例 | 原因 |
 |------|------|
-| MF-TEAM-001 / 003 | 待团队商城 Seed，当前固定 skip |
-| MF-TEAM-002 | admin 无团队订阅（空态） |
+| MF-MC-003 | admin 无可分配团队 / 名额已耗尽 |
+| MF-MC-004 | 依赖 MF-MC-003 成功分配；`.auth/user.json` 缺失时 skip |
+| MF-MC-005 | 团队暂无学习数据时只断言空态 |
 | MF-COURSE-004 | 课程无 PDF 小节 |
+| MF-COURSE-005 | 课程小节数 ≤ 1 |
+| MF-COURSE-006 | 纯免费课无 VIP 试看节 |
 | MF-CERT-003 | 认证无「进入模拟测试」 |
 | MF-CERT-004 | 当前状态无进考按钮 |
 | MF-CERT-007 | 「我的考试」无记录 |

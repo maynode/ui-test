@@ -28,6 +28,8 @@
     "test:main-flow:tcTest": "cross-env ENV=tcTest playwright test --project=TC-MainFlow --grep @MainFlow --grep-invert @Destructive --workers=1",
     "test:main-flow:screenshots:tcTest": "cross-env ENV=tcTest STEP_SCREENSHOT=1 playwright test --project=TC-MainFlow --grep @MainFlow --grep-invert @Destructive --workers=1",
     "test:main-flow:destructive:tcTest": "cross-env ENV=tcTest playwright test --project=TC-MainFlow --grep \"(?=.*@MainFlow)(?=.*@Destructive)\" --workers=1",
+    "test:main-flow:mc": "playwright test --project=TC-MainFlow --grep @MainFlow --grep-invert @Destructive --workers=1 mf-manage-center",
+    "test:main-flow:mc:tcTest": "cross-env ENV=tcTest playwright test --project=TC-MainFlow --grep @MainFlow --grep-invert @Destructive --workers=1 mf-manage-center",
     "test:tc-platform": "playwright test --project=TC-Platform --grep-invert @Destructive",
     "test:tc-platform:smoke": "playwright test --grep @Smoke --project=TC-Platform --workers=1",
     "test:tc-platform:destructive": "playwright test --grep @Destructive --project=TC-Platform --workers=1",

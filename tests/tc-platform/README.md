@@ -110,10 +110,11 @@ pnpm run test:tc-platform:smoke --ENV=tcTest
 |------|------|------|
 | `TC-COURSE` | 课程学习 | `course-learning.spec.ts` |
 | `TC-CERT` | 认证考试 | `cert-exam.spec.ts` |
-| `TC-TEAM` | 团队服务 | `team-management.spec.ts` |
 | `TC-NCRE` | NCRE | `ncre.spec.ts` |
 | `TC-PARTNER` | 伙伴认证 | `partner-cert.spec.ts` |
 | `TC-AUTH` | 访问拦截 / 无权限 | `access-control.spec.ts` |
+
+> 团队服务已迁至管理中心，覆盖见 `tests/main-flow/manage-center/`（原 `team-management.spec.ts` 与 TC-TEAM-001~005 已下架）。
 
 新增用例：沿用模块前缀，序号递增；标题写成 `TC-XXX-00N 中文描述`。
 
@@ -128,21 +129,16 @@ pnpm run test:tc-platform:smoke --ENV=tcTest
 | TC-CERT-002 | 完整考试交卷流程 | @Destructive | user | **必填** 可进考 certId；已实名 | 已写 |
 | TC-CERT-003 | 我的考试记录展示 | @Regression | user | — | 已写 |
 | TC-CERT-004 | 我的证书展示 | @Regression | user | — | 已写 |
-| TC-TEAM-001 | 团队服务页加载 | @Smoke | admin-website | — | 已写 |
-| TC-TEAM-002 | 团队服务区块或空态展示 | @Regression | admin-website | — | 已写 |
-| TC-TEAM-003 | 空态下开通入口可见 | @Regression | admin-website | 空态账号更佳 | 已写 |
+| TC-CERT-005 | 在线考试多状态 UI 识别 | @Regression | user | **必填** certId | 已写 |
 | TC-NCRE-001 | NCRE 模块加载 | @Smoke | user | — | 已写 |
 | TC-PARTNER-001 | 伙伴认证模块加载（岗位区块平铺） | @Smoke | partner | — | 已写 |
 | TC-PARTNER-002 | 伙伴专属权益与课程/去考试展示 | @Regression | partner | — | 已写 |
-| TC-CERT-005 | 在线考试多状态 UI 识别 | @Regression | user | **必填** certId | 已写 |
-| TC-TEAM-004 | 团队折叠区块可展开 | @Regression | admin-website | 非空态账号 | 已写 |
-| TC-TEAM-005 | 名额管理页可进入 | @Regression | admin-website | 非空态 + 有名额行 | 已写 |
 | TC-AUTH-001 | 未登录访问个人中心重定向 | @Regression | 无登录态 | — | 已写 |
 | TC-AUTH-002 | 未登录点击开始学习弹登录框 | @Regression | 无登录态 | courseId 可选 | 已写 |
 | TC-AUTH-003 | 非 partner 立即学习无权限弹窗 | @Regression | user | 伙伴页有课程卡 | 已写 |
 | TC-AUTH-004 | 非 partner 去考试无权限弹窗 | @Regression | user | 伙伴页有去考试 | 已写 |
 
-**合计**：20 条（8 Smoke + 11 Regression + 1 Destructive）
+**合计**：15 条（8 Smoke + 6 Regression + 1 Destructive）
 
 ## 测试数据
 

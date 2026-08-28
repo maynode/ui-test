@@ -27,4 +27,21 @@ export class MyExamPage {
     async hasExamRecords() {
         return this.examTable.isVisible();
     }
+
+    async getExamRowCount(): Promise<number> {
+        if (!(await this.hasExamRecords())) return 0;
+        return await this.page.locator('.my-exam .el-table__body-wrapper tbody tr').count();
+    }
+
+    /**
+     * 读取第一条考试记录详情 [科目名, 考试状态, 分数]
+     */
+    async readFirstExamRecord(): Promise<{ name: string; status: string; score: string }> {
+        const rows = this.page.locator('.my-exam .el-table__body-wrapper tbody tr');
+        const firstRow = rows.first();
+        const name = (await firstRow.locator('.exam-name-column, td:nth-child(1)').innerText()).trim();
+        const status = (await firstRow.locator('td:nth-child(3)').innerText()).trim();
+        const score = (await firstRow.locator('td:nth-child(4)').innerText()).trim();
+        return { name, status, score };
+    }
 }

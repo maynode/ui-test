@@ -1,0 +1,46 @@
+req_id: REQ-260828-003
+title: "主流程重构批次三：认证考试闭环与发证/补考 E2E"
+created: 2026-08-28
+phase: complete
+review_status: approved
+review_round: 1
+last_skill: req-manager
+tasks:
+  - id: 1
+    desc: "扩展 ExamPage / MyExamPage / MyCertPage POM 能力"
+    status: done
+    summary: "在 ExamPage、MyExamPage、MyCertPage 补齐自测流程、连续多题答题、提交结果断言、考试列表字段提取与证书卡片操作方法；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 2
+    desc: "深化 MF-CERT-003 模拟自测答题与交卷闭环"
+    status: done
+    summary: "在 mf-cert.spec.ts 中重构 MF-CERT-003 为自测进入、须知阅读、多题作答与交卷成功全闭环；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 3
+    desc: "深化 MF-CERT-005 & MF-CERT-006 正式考试流程"
+    status: done
+    summary: "在 mf-cert.spec.ts 中深化 MF-CERT-005 前置向导与 MF-CERT-006 多客观题连续作答与确认交卷；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 4
+    desc: "深化 MF-CERT-007 & MF-CERT-008 考试记录与状态机断言"
+    status: done
+    summary: "在 mf-cert.spec.ts 中增加 MF-CERT-007 跨页状态同步与 MF-CERT-008 我的考试记录行数据与状态字段提取；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 5
+    desc: "深化 MF-CERT-009 我的证书卡片、编号与下载操作"
+    status: done
+    summary: "在 mf-cert.spec.ts 中深化 MF-CERT-009 证书卡片名称、证书编号提取与查看下载操作可用性断言；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 6
+    desc: "同步主流程矩阵、运行手册、前置文档与 Backlog"
+    status: done
+    summary: "更新 MAIN-FLOW-MATRIX.md（§2 认证考试 8 项深度闭环、总深度达 19 项）、COVERAGE-BACKLOG.md；全量 tsc 与 eslint 0 错误"
+    concerns: ""
+context:
+  after_task_1: "ExamPage、MyExamPage、MyCertPage 均补齐自测流程、连续多题答题、提交结果断言、考试列表字段提取与证书卡片操作方法。"
+  after_task_2: "MF-CERT-003 完成自测进入、须知阅读、客观题作答与交卷成功全闭环断言。"
+  after_task_3: "MF-CERT-005 & MF-CERT-006 完成正式考试前置向导与多题客观题连续作答与确认交卷。"
+  after_task_4: "MF-CERT-007 & MF-CERT-008 完成跨页考试状态机同步与列表记录字段提取断言。"
+  after_task_5: "MF-CERT-009 完成证书卡片名称、证书编号提取与查看下载操作可用性断言。"
+  after_task_6: "主流程 24 条中深度验收闭环用例提升至 19 条（✅ 19 | 🟡 5 | ❌ 0）；所有文档与缺口已同步对齐。"
+last_updated: 2026-08-28

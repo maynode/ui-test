@@ -1,0 +1,40 @@
+req_id: REQ-260828-004
+title: "主流程重构批次四：全主流程 100% 验收闭环（进考向导/课程详情/报表分析深化）"
+created: 2026-08-28
+phase: complete
+review_status: approved
+review_round: 1
+last_skill: req-manager
+tasks:
+  - id: 1
+    desc: "扩展 CourseListPage / CourseDetailPage / ManageCenterReportPage POM 能力"
+    status: done
+    summary: "在 CourseDetailPage、ManageCenterReportPage 补齐课程大纲元数据提取、标题获取与报表统计卡片数统计方法；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 2
+    desc: "深化 MF-CERT-004 点击去考试按钮与进考确认"
+    status: done
+    summary: "在 mf-cert.spec.ts 中深化 MF-CERT-004：增加步骤导航可见性、进考按钮状态、二次确认 MessageBox 与弹窗新页面 URL 闭环断言；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 3
+    desc: "深化 MF-MC-005 报表分析统计与明细表"
+    status: done
+    summary: "在 mf-manage-center.spec.ts 中深化 MF-MC-005：增加概览统计卡片数提取、导出按钮可见性断言；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 4
+    desc: "深化 MF-COURSE-001、MF-COURSE-002 与 MF-COURSE-004"
+    status: done
+    summary: "在 mf-course.spec.ts 中深化 MF-COURSE-001、002 与 004：增加课程标题提取、课程大纲目录小节数大于 0 断言；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 5
+    desc: "同步主流程矩阵（24/24 ✅ 100% 闭环）、运行手册与 Backlog"
+    status: done
+    summary: "更新 MAIN-FLOW-MATRIX.md（所有 24 项主流程全部达到 ✅ 深度闭环标准，100% 深度验收覆盖）；全量 tsc 与 eslint 0 错误"
+    concerns: ""
+context:
+  after_task_1: "CourseDetailPage、ManageCenterReportPage 补齐课程大纲元数据提取与报表统计卡片数统计方法。"
+  after_task_2: "MF-CERT-004 完成步骤导航可见性、进考按钮状态、二次确认 MessageBox 与弹窗新页面 URL 闭环断言。"
+  after_task_3: "MF-MC-005 完成概览统计卡片数提取、导出按钮可见性断言。"
+  after_task_4: "MF-COURSE-001、002 与 004 完成课程标题提取、课程大纲目录小节数大于 0 与文档学习视图识别。"
+  after_task_5: "主流程矩阵 24 条主流程用例已 100% 达到 ✅ 深度闭环标准（✅ 24 | 🟡 0 | ❌ 0）。"
+last_updated: 2026-08-28

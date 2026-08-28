@@ -19,13 +19,13 @@
 
 | 目录 | 模块 | 文件 | 条数 |
 |------|------|------|------|
-| `course/` | 课程学习 | `mf-course.spec.ts` | 4 |
+| `course/` | 课程学习 | `mf-course.spec.ts` | 6 |
 | `cert/` | 认证考试 | `mf-cert.spec.ts` | 9 |
-| `team/` | 团队管理 | `mf-team.spec.ts` | 3 |
+| `manage-center/` | 管理中心 | `mf-manage-center.spec.ts` | 5 |
 | `ncre/` | NCRE | `mf-ncre.spec.ts` | 1 |
 | `partner/` | 伙伴认证 | `mf-partner.spec.ts` | 3 |
 
-**合计 20 条**（`@MainFlow`）；其中 **2 条** 另标 `@Destructive`（MF-CERT-005/006）。
+**合计 24 条**（`@MainFlow`）；其中 **2 条** 另标 `@Destructive`（MF-CERT-005/006），非破坏性 **22 条**。
 
 ---
 
@@ -39,7 +39,7 @@ cd d:\CERT-ALL-CODES\etcert-e2e
 # 1. 造数（建议）
 pnpm run test:tc-admin:seed:tcTest
 
-# 2. 主流程（非破坏性，18 条）
+# 2. 主流程（非破坏性，22 条）
 pnpm run test:main-flow:tcTest
 
 # 3. 破坏性主流程（交卷/完整考试，2 条）
@@ -105,7 +105,7 @@ await stepWithScreenshot(page, '导航到课程页', async () => {
 
 | 套件 | 目录 | 命令 | 职责 |
 |------|------|------|------|
-| **主流程** | `tests/main-flow/` | `test:main-flow` | 产品验收清单 20 项 |
+| **主流程** | `tests/main-flow/` | `test:main-flow` | 产品验收清单 24 项 |
 | **扩展回归** | `tests/tc-platform/` | `test:tc-platform` | TC-AUTH、多状态加深、历史 Smoke |
 | **造数** | `tests/tc-admin/` | `test:tc-admin:seed` | `@Seed` → catalog |
 
@@ -117,9 +117,12 @@ PO（`pageFactory/`）、`BaseTest`、`lib/catalog` **共用**，不重复维护
 
 | ID | 原因 |
 |----|------|
-| MF-TEAM-001 | 待商城购买 / SEED-TEAM |
-| MF-TEAM-003 | 待未注册占位分配场景 |
+| MF-MC-003 | admin 无可分配团队 / 名额已耗尽 |
+| MF-MC-004 | 依赖 MF-MC-003 成功分配；`.auth/user.json` 缺失时 skip |
+| MF-MC-005 | 团队暂无学习数据时只断言空态 |
 | MF-COURSE-004 | 课程无 PDF 小节时 skip |
+| MF-COURSE-005 | 课程小节数 ≤ 1 时 skip |
+| MF-COURSE-006 | 纯免费课无 VIP 试看时 skip |
 | MF-CERT-003/004/007 | 无自测入口 / 无进考按钮 / 我的考试无记录 |
 | MF-PARTNER-* | 缺 partner 账号或页上无课程卡 |
 

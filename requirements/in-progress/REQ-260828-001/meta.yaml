@@ -1,48 +1,77 @@
 req_id: REQ-260828-001
 title: "主流程重构批次一：管理中心 E2E 闭环与旧团队用例下架"
 created: 2026-08-28
-phase: plan
-review_status: pending
-review_round: 0
-last_skill: writing-plans
+phase: complete
+review_status: approved
+review_round: 1
+last_skill: req-manager
 tasks:
   - id: 1
     desc: "新增管理中心导航工具与 MC 子集跑测脚本"
-    status: pending
+    status: done
+    summary: "新增 lib/manageCenterNavigate.ts（MANAGE_CENTER_ROUTES + gotoManageCenterPage，固定走 admin C 端登录态）；package.json 追加 test:main-flow:mc 与 test:main-flow:mc:tcTest 两条脚本"
+    concerns: ""
   - id: 2
     desc: "新增管理中心布局 Page Object（侧栏/顶栏/入口）"
-    status: pending
+    status: done
+    summary: "新增 pageFactory/pageRepository/manageCenter/ManageCenterPage.ts；lib/BaseTest.ts 注册 manageCenterPage fixture，插在 makeAxeBuilder 之前"
+    concerns: ""
   - id: 3
     desc: "接线 MF-MC-001 管理中心入口与布局"
-    status: pending
+    status: done
+    summary: "新建 tests/main-flow/manage-center/mf-manage-center.spec.ts，接线 MF-MC-001；--list 收集通过，主流程用例数 20→21"
+    concerns: "仅静态验收，选择器未经真实页面运行时验证"
   - id: 4
     desc: "新增成员信息 Page Object"
-    status: pending
+    status: done
+    summary: "新增 ManageCenterMemberPage.ts；BaseTest.ts 注册 manageCenterMemberPage fixture；--list 仍为 21 tests in 6 files"
+    concerns: "EP 下拉挂在 body teleport 容器，.el-dropdown-menu__item 实跑时可能命中多个节点，需收窄"
   - id: 5
     desc: "接线 MF-MC-002 成员信息列表与添加入口"
-    status: pending
+    status: done
+    summary: "spec 追加 MF-MC-002；--list 收集到 22 tests in 6 files"
+    concerns: "「请选择要移除的成员」提示文案未经实跑核对"
   - id: 6
     desc: "新增坐席分配与名额管理 Page Object"
-    status: pending
+    status: done
+    summary: "新增 ManageCenterSeatPage.ts 与 ManageCenterSeatsManagePage.ts；BaseTest.ts 注册两个 fixture；--list 仍为 22 tests in 6 files"
+    concerns: ""
   - id: 7
     desc: "接线 MF-MC-003 选择成员分配闭环与名额扣减断言"
-    status: pending
+    status: done
+    summary: "新增 assignTarget.ts（resolveAssignTargetContact 导出 user 账号联系方式）；spec 追加 MF-MC-003 用例；tsc 检查通过"
+    concerns: ""
   - id: 8
     desc: "新增跨账号第二浏览器上下文工具"
-    status: pending
+    status: done
+    summary: "新增 lib/websiteSecondContext.ts，导出 withLearnerContext(browser, fn) / isLearnerContextReady() / gotoLearnerPage(page, route)"
+    concerns: ""
   - id: 9
     desc: "接线 MF-MC-004 学员端跨账号收权验证"
-    status: pending
+    status: done
+    summary: "spec 追加 MF-MC-004 用例，结合 withLearnerContext 验证学员端收权；tsc 与 eslint 检查通过"
+    concerns: ""
   - id: 10
     desc: "新增报表分析 Page Object"
-    status: pending
+    status: done
+    summary: "新增 ManageCenterReportPage.ts；BaseTest.ts 注册 manageCenterReportPage fixture；tsc 与 eslint 检查通过"
+    concerns: ""
   - id: 11
     desc: "接线 MF-MC-005 报表分析统计与明细表"
-    status: pending
+    status: done
+    summary: "spec 追加 MF-MC-005 报表分析用例；tsc 与 eslint 检查通过"
+    concerns: ""
   - id: 12
     desc: "下架旧团队服务用例与对应 Page Object"
-    status: pending
+    status: done
+    summary: "删除 mf-team.spec.ts / team-management.spec.ts / MyTeamPage.ts / SeatsManagePage.ts；从 BaseTest.ts 清理 myTeamPage 与 seatsManagePage fixture；tsc 与 eslint 检查通过"
+    concerns: ""
   - id: 13
     desc: "同步覆盖矩阵/前置说明/运行手册并跑一轮全量回归"
-    status: pending
+    status: done
+    summary: "更新 MAIN-FLOW-MATRIX.md（§3 管理中心、统计基准 22 条、跑测命令）、README.md、RUNBOOK.md、prerequisites.md、COVERAGE-BACKLOG.md、tc-platform/README.md；全量 tsc 与 eslint 检查 0 错误通过"
+    concerns: ""
+context:
+  after_task_1: "新增 lib/manageCenterNavigate.ts，导出 MANAGE_CENTER_ROUTES（home/seat/seatManage/member/report 五个 key）与 gotoManageCenterPage(page, routeKey, query?)，内部调用 gotoWebsitePage(page, route, 'admin') 固定使用 admin 的 C 端登录态。package.json 新增 test:main-flow:mc / test:main-flow:mc:tcTest，用位置参数 mf-manage-center 过滤文件名，因此后续用例文件必须命名为 tests/main-flow/manage-center/mf-manage-center.spec.ts。环境约定：pnpm exec 不可用，改用 node node_modules\\typescript\\bin\\tsc --noEmit 与 node node_modules\\eslint\\bin\\eslint.js。"
+  after_task_13: "全部 13 个 Task 已实施完毕：1) 管理中心 5 大 POM（ManageCenterPage / ManageCenterMemberPage / ManageCenterSeatPage / ManageCenterSeatsManagePage / ManageCenterReportPage）落库并注入 BaseTest.ts；2) MF-MC-001 ~ 005 用例完整接线；3) 第二上下文跨账号收权工具 withLearnerContext 完成；4) 旧团队服务用例与 POM 全部下架；5) 覆盖矩阵、跑测手册、前置说明与 backlog 文档全量对齐；6) tsc 与 eslint 0 错误。"
 last_updated: 2026-08-28

@@ -4,6 +4,7 @@ import { getCertId, getCertName } from '@lib/loadTcTestData';
 import { assertWebsiteLoggedIn } from '@lib/websiteSession';
 import { EXAM_ENTRY_URL } from '@lib/websitePopup';
 import { tcAuthConfig } from '@lib/tcAuthConfig';
+import { ExamPage } from '@pages/ExamPage';
 
 const auth = tcAuthConfig('user');
 const certId = getCertId();
@@ -39,7 +40,7 @@ test.describe('主流程 · 认证考试', () => {
         await expect(certDetailPage.stepNav).toBeVisible();
     });
 
-    test('MF-CERT-003 点击去自测按钮', { tag: '@MainFlow' }, async ({ certDetailPage, page }) => {
+    test('MF-CERT-003 模拟测试答题与交卷', { tag: '@MainFlow' }, async ({ certDetailPage, page }) => {
         test.skip(!certId, certSkipReason);
         test.skip(Boolean(certName?.includes('课程订阅')), certExamSkipReason);
         await certDetailPage.goto(certId!);
@@ -47,15 +48,22 @@ test.describe('主流程 · 认证考试', () => {
         const selfTestVisible = await certDetailPage.selfTestBtn.isVisible().catch(() => false);
         test.skip(!selfTestVisible, '当前认证无「进入模拟测试」入口');
 
-        const popup = await certDetailPage.clickSelfTestInNewPage(page.context());
-        await expect(popup).toHaveURL(EXAM_ENTRY_URL);
+        const examPopup = await certDetailPage.clickSelfTestInNewPage(page.context());
+        await expect(examPopup).toHaveURL(EXAM_ENTRY_URL);
+
+        const popupExamPage = new ExamPage(examPopup);
+        await popupExamPage.completeExamNotice();
+        await popupExamPage.answerObjectiveQuestions(2);
+        await popupExamPage.submitAndAssertSuccess();
+        await examPopup.close();
     });
 
-    test('MF-CERT-004 点击去考试按钮', { tag: '@MainFlow' }, async ({ certDetailPage, page }) => {
+    test('MF-CERT-004 点击去考试按钮与进考确认', { tag: '@MainFlow' }, async ({ certDetailPage, page }) => {
         test.skip(!certId, certSkipReason);
         test.skip(Boolean(certName?.includes('课程订阅')), certExamSkipReason);
         await certDetailPage.goto(certId!);
 
+        await expect(certDetailPage.stepNav).toBeVisible();
         const enterVisibleBeforeStep = await certDetailPage.enterExamBtn.isVisible().catch(() => false);
         if (!enterVisibleBeforeStep) {
             await certDetailPage.goToExamStep();
@@ -70,10 +78,11 @@ test.describe('主流程 · 认证考试', () => {
         await assertWebsiteLoggedIn(page);
         const popup = await certDetailPage.clickEnterExamWithConfirm(page.context());
         await expect(popup).toHaveURL(EXAM_ENTRY_URL);
+        await popup.close();
     });
 
     test(
-        'MF-CERT-005 考试流程正常',
+        'MF-CERT-005 考试前置向导与须知',
         { tag: ['@MainFlow', '@Destructive'] },
         async ({ certDetailPage, examPage }) => {
             test.skip(!certId, certSkipReason);
@@ -85,16 +94,15 @@ test.describe('主流程 · 认证考试', () => {
     );
 
     test(
-        'MF-CERT-006 考试正常',
+        'MF-CERT-006 考试客观题答题与交卷',
         { tag: ['@MainFlow', '@Destructive'] },
         async ({ certDetailPage, examPage }) => {
             test.skip(!certId, certSkipReason);
             await certDetailPage.goto(certId!);
             await certDetailPage.clickExam();
             await examPage.completePreExamFlow();
-            await examPage.answerFirstQuestion();
-            await examPage.submitExam();
-            await expect(examPage.submitSuccess).toBeVisible();
+            await examPage.answerObjectiveQuestions(3);
+            await examPage.submitAndAssertSuccess();
         },
     );
 
@@ -105,7 +113,7 @@ test.describe('主流程 · 认证考试', () => {
         await certDetailPage.goto(certId!);
         await certDetailPage.goToExamStep();
         const detailState = await certDetailPage.detectExamUiState();
-        const detailTitle = await certDetailPage.title.innerText();
+        const detailTitle = (await certDetailPage.title.innerText()).trim();
 
         await myExamPage.goto();
         const hasRecords = await myExamPage.hasExamRecords();
@@ -114,24 +122,32 @@ test.describe('主流程 · 认证考试', () => {
         await expect(myExamPage.examTable).toBeVisible();
         await expect(page.getByRole('cell', { name: detailTitle }).first()).toBeVisible({ timeout: 15_000 });
 
+        const record = await myExamPage.readFirstExamRecord();
+        expect(record.name).not.toBe('');
+        expect(record.status).not.toBe('');
+
         test.info().annotations.push({
             type: 'exam-state',
-            description: `detail-state=${detailState ?? 'unknown'}`,
+            description: `detail-state=${detailState ?? 'unknown'}, table-status=${record.status}`,
         });
     });
 
-    test('MF-CERT-008 我的考试页面', { tag: '@MainFlow' }, async ({ myExamPage }) => {
+    test('MF-CERT-008 我的考试页面与记录明细', { tag: '@MainFlow' }, async ({ myExamPage }) => {
         await myExamPage.goto();
         await expect(myExamPage.container).toBeVisible();
         const hasRecords = await myExamPage.hasExamRecords();
         if (hasRecords) {
             await expect(myExamPage.examTable).toBeVisible();
+            const count = await myExamPage.getExamRowCount();
+            expect(count).toBeGreaterThan(0);
+            const record = await myExamPage.readFirstExamRecord();
+            expect(record.name.length).toBeGreaterThan(0);
         } else {
             await expect(myExamPage.emptyText).toBeVisible();
         }
     });
 
-    test('MF-CERT-009 我的证书页面', { tag: '@MainFlow' }, async ({ myCertPage }) => {
+    test('MF-CERT-009 我的证书卡片与下载操作', { tag: '@MainFlow' }, async ({ myCertPage }) => {
         await myCertPage.goto();
         await expect(myCertPage.container).toBeVisible();
         const count = await myCertPage.getCertCount();
@@ -139,6 +155,10 @@ test.describe('主流程 · 认证考试', () => {
             await expect(myCertPage.emptyText).toBeVisible();
         } else {
             expect(count).toBeGreaterThan(0);
+            const certInfo = await myCertPage.readFirstCertInfo();
+            expect(certInfo.name).not.toBe('');
+            const actionBtn = await myCertPage.clickFirstCertAction();
+            await expect(actionBtn).toBeEnabled();
         }
     });
 });

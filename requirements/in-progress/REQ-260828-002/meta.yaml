@@ -1,0 +1,40 @@
+req_id: REQ-260828-002
+title: "主流程重构批次二：课程视频播控深化与试看拦截 E2E"
+created: 2026-08-28
+phase: complete
+review_status: approved
+review_round: 1
+last_skill: req-manager
+tasks:
+  - id: 1
+    desc: "扩展课程详情/学习页 POM 播控与试看能力"
+    status: done
+    summary: "在 CourseDetailPage.ts 补齐播控、倍速、全屏、选节及试看定位器与交互方法；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 2
+    desc: "重构 MF-COURSE-003：视频起播、暂停恢复、倍速调节与全屏模式"
+    status: done
+    summary: "重构 mf-course.spec.ts 中 MF-COURSE-003，增加起播推进、播放/暂停、1.5x 倍速、全屏模式深度断言；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 3
+    desc: "新增 MF-COURSE-005：选节与连播切换"
+    status: done
+    summary: "新增 MF-COURSE-005 用例，验证上一节/下一节连播与侧栏大纲激活联动；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 4
+    desc: "新增 MF-COURSE-006：VIP 课程试看与会员拦截"
+    status: done
+    summary: "新增 MF-COURSE-006 用例，验证 VIP 小节 60s 试看提示条、试看结束遮罩层及开通会员引导弹窗；tsc 与 eslint 检查通过"
+    concerns: ""
+  - id: 5
+    desc: "同步主流程矩阵、运行手册、前置文档与 Backlog"
+    status: done
+    summary: "更新 MAIN-FLOW-MATRIX.md（§1 课程学习 6 项、统计基准 24 条）、README.md、RUNBOOK.md、prerequisites.md、COVERAGE-BACKLOG.md；tsc 与 eslint 0 错误"
+    concerns: ""
+context:
+  after_task_1: "CourseDetailPage.ts 已补齐视频播放器底层属性穿透断言（assertVideoPlaying、changePlaybackRate、toggleWebFullscreen）、选节控制（clickNextUnit、clickPrevUnit）及试看控制（seekNearPreviewEnd、hasVipUnits）。"
+  after_task_2: "MF-COURSE-003 已深度重构为「课程视频播放与播控交互」，串联起播、暂停恢复、倍速调节与网页全屏。"
+  after_task_3: "MF-COURSE-005 落地，完成课程多小节上一节/下一节切换与起播状态断言。"
+  after_task_4: "MF-COURSE-006 落地，完成 VIP 试看提示条、试看结束遮罩及会员拦截弹窗断言。"
+  after_task_5: "全部 5 个 Task 实施完毕：主流程总条数由 22 扩充至 24（非破坏性 22 + 破坏性 2），课程模块达到 6 条，深度闭环用例达 13 条；所有文档与前置说明已对齐。"
+last_updated: 2026-08-28
