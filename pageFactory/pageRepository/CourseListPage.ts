@@ -1,5 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 import { gotoWebsitePage, gotoWebsitePageWithoutLogin } from '@lib/websiteNavigate';
+import { ensureNoBlockingDialogs } from '@lib/websiteDialog';
 
 /**
  * 课程入口页 Page Object
@@ -41,9 +42,11 @@ export class CourseListPage {
         }
 
         if (await backBtn.isVisible().catch(() => false)) {
+            await ensureNoBlockingDialogs(this.page);
             await backBtn.click();
         }
         await this.container.waitFor({ state: 'visible', timeout: 15_000 });
+        await ensureNoBlockingDialogs(this.page);
     }
 
     /** 未登录场景直进课程页（如 TC-AUTH-002），不触发 OAuth */
@@ -58,6 +61,7 @@ export class CourseListPage {
     }
 
     async openFirstCourse() {
+        await ensureNoBlockingDialogs(this.page);
         await this.ctaButton.click();
     }
 }

@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 import type { AccountRole } from './loadAccounts';
-import { assertWebsiteLoggedIn, ensureWebsiteLoggedIn } from './websiteSession';
+import { assertWebsiteLoggedIn, ensureWebsiteLoggedIn, reloginWebsiteIfNeeded } from './websiteSession';
 import { dismissBlockingWebsiteDialogs } from './websiteDialog';
 import { websitePath } from './websitePath';
 
@@ -17,6 +17,9 @@ export async function gotoWebsitePage(
 ): Promise<void> {
     await ensureWebsiteLoggedIn(page, role);
     await gotoWithRetry(page, websitePath(route));
+    if (await reloginWebsiteIfNeeded(page, role)) {
+        await gotoWithRetry(page, websitePath(route));
+    }
     await assertWebsiteLoggedIn(page);
     await dismissBlockingWebsiteDialogs(page);
 }

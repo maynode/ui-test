@@ -1,7 +1,7 @@
 import { Page, Locator, expect } from '@playwright/test';
 import type { BrowserContext } from '@playwright/test';
 import { assertWebsiteLoggedIn } from '@lib/websiteSession';
-import { confirmZwDialog, confirmZwDialogIfVisible } from '@lib/websiteDialog';
+import { confirmZwDialog, confirmZwDialogIfVisible, dismissBlockingWebsiteDialogs, ensureNoBlockingDialogs } from '@lib/websiteDialog';
 import { EXAM_ENTRY_URL, waitForWebsitePopupUrl } from '@lib/websitePopup';
 import { gotoWebsitePage } from '@lib/websiteNavigate';
 
@@ -47,17 +47,21 @@ export class CertDetailPage {
         await gotoWebsitePage(this.page, `/cert/detail?certId=${certId}`);
         await this.container.waitFor({ state: 'visible' });
         await this.title.waitFor({ state: 'visible' });
+        await dismissBlockingWebsiteDialogs(this.page);
     }
 
     async goToExamStep() {
+        await ensureNoBlockingDialogs(this.page);
         const examStepItem = this.page.locator('.step-nav__item').filter({ hasText: '在线考试' });
         await examStepItem.waitFor({ state: 'visible', timeout: 30_000 });
         await examStepItem.click();
         await expect(this.examModule).toBeVisible({ timeout: 30_000 });
+        await dismissBlockingWebsiteDialogs(this.page);
     }
 
     async clickSelfTest() {
         await assertWebsiteLoggedIn(this.page);
+        await ensureNoBlockingDialogs(this.page);
         await this.learnStep.click();
         await this.page.locator('.module-learn').waitFor({ state: 'visible' });
         await this.selfTestBtn.click();
@@ -67,6 +71,7 @@ export class CertDetailPage {
     async clickExam() {
         await assertWebsiteLoggedIn(this.page);
         await this.goToExamStep();
+        await ensureNoBlockingDialogs(this.page);
         await this.enterExamBtn.click();
         await confirmZwDialog(this.page);
     }
@@ -75,6 +80,7 @@ export class CertDetailPage {
     async clickEnterExamWithConfirm(context: BrowserContext) {
         return waitForWebsitePopupUrl(context, async () => {
             await assertWebsiteLoggedIn(this.page);
+            await ensureNoBlockingDialogs(this.page);
             await this.enterExamBtn.click();
             await confirmZwDialog(this.page);
         }, EXAM_ENTRY_URL);
@@ -153,6 +159,7 @@ export class CertDetailPage {
         }
         const enterVisible = await this.enterExamBtn.isVisible().catch(() => false);
         if (enterVisible) {
+            await ensureNoBlockingDialogs(this.page);
             await this.enterExamBtn.click();
             await confirmZwDialogIfVisible(this.page);
         }

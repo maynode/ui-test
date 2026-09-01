@@ -1,5 +1,5 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { dismissBlockingWebsiteDialogs } from '@lib/websiteDialog';
+import { dismissBlockingWebsiteDialogs, ensureNoBlockingDialogs } from '@lib/websiteDialog';
 
 /**
  * 课程详情 / 学习页 Page Object
@@ -42,7 +42,7 @@ export class CourseDetailPage {
         this.favoriteButton = page.getByRole('button', { name: /^收藏|已收藏$/ });
         this.videoArea = page.locator('.zw-course-video');
         this.videoPlayer = page.locator('.zw-course-video video, .zw-course-video .video-render, .zw-course-video .prism-player');
-        this.videoElement = page.locator('.zw-course-video video').first();
+        this.videoElement = page.locator('.zw-course-video .prism-player video, .zw-course-video video').first();
         this.playButton = page.locator('.prism-play-btn').first();
         this.rateComponent = page.locator('.rate-components').first();
         this.currentRate = this.rateComponent.locator('.current-rate');
@@ -71,7 +71,59 @@ export class CourseDetailPage {
     }
 
     async clickPlay() {
+        await ensureNoBlockingDialogs(this.page);
         await this.ctaButton.click();
+    }
+
+    /** 若视频暂停则尝试触发播放（切节后常需用户交互） */
+    private async kickVideoPlayback() {
+        const posterPlay = this.page.locator('.course-video-early-poster__play, .prism-big-play-btn');
+        if (await posterPlay.first().isVisible().catch(() => false)) {
+            await posterPlay.first().click().catch(() => undefined);
+            return;
+        }
+
+        const paused = await this.readVideoMetrics().then((m) => m?.paused ?? true).catch(() => true);
+        if (!paused) {
+            return;
+        }
+
+        await this.videoArea.hover().catch(() => undefined);
+        const namedPlayBtn = this.page.getByRole('button', { name: '播放' });
+        if (await namedPlayBtn.isVisible().catch(() => false)) {
+            await namedPlayBtn.click().catch(() => undefined);
+            return;
+        }
+        if (await this.playButton.isVisible().catch(() => false)) {
+            await this.playButton.click().catch(() => undefined);
+            return;
+        }
+        await this.videoArea.click({ force: true }).catch(() => undefined);
+    }
+
+    private async readVideoMetrics(): Promise<{ paused: boolean; currentTime: number; readyState: number } | null> {
+        return this.videoElement
+            .evaluate((el: HTMLVideoElement) => ({
+                paused: el.paused,
+                currentTime: el.currentTime,
+                readyState: el.readyState,
+            }))
+            .catch(() => null);
+    }
+
+    /** 控制栏已显示非零进度（Aliplayer 续播时 video.currentTime 可能滞后） */
+    private async hasControlBarTimeProgress(): Promise<boolean> {
+        const timeText = await this.page
+            .locator('.prism-time-display, .unit-nav-play-group')
+            .first()
+            .innerText()
+            .catch(() => '');
+        const match = timeText.match(/(\d{1,2}):(\d{2})\s*\/\s*(\d{1,2}):(\d{2})/);
+        if (!match) {
+            return false;
+        }
+        const currentSeconds = Number(match[1]) * 60 + Number(match[2]);
+        return currentSeconds > 0;
     }
 
     /** 主流程 MF-COURSE-003：断言视频真实起播且时间向前推进 */
@@ -79,15 +131,29 @@ export class CourseDetailPage {
         await expect(this.videoArea).toBeVisible({ timeout: 60_000 });
         await expect(this.videoElement).toBeAttached({ timeout: 60_000 });
 
-        // 若初次加载处于暂停态，尝试点击大播放按钮或控制栏播放按钮
-        const posterPlay = this.page.locator('.course-video-early-poster__play');
-        if (await posterPlay.isVisible().catch(() => false)) {
-            await posterPlay.click().catch(() => {});
-        }
+        await this.kickVideoPlayback();
 
-        // 等待 video currentTime 推进
+        let baselineTime = -1;
         await expect.poll(async () => {
-            return await this.videoElement.evaluate((el: HTMLVideoElement) => !el.paused && el.currentTime > minSeconds).catch(() => false);
+            const metrics = await this.readVideoMetrics();
+            if (metrics) {
+                if (metrics.currentTime > minSeconds) {
+                    return true;
+                }
+                if (!metrics.paused) {
+                    if (baselineTime >= 0 && metrics.currentTime > baselineTime + 0.05) {
+                        return metrics.currentTime > minSeconds || minSeconds <= 0.1;
+                    }
+                    baselineTime = Math.max(baselineTime, metrics.currentTime);
+                }
+            }
+
+            if (minSeconds <= 0.1 && (await this.hasControlBarTimeProgress())) {
+                return true;
+            }
+
+            await this.kickVideoPlayback();
+            return false;
         }, { timeout: 30_000 }).toBeTruthy();
     }
 
@@ -136,6 +202,7 @@ export class CourseDetailPage {
 
     /** 点击下一节，返回切换前后的激活小节名称 */
     async clickNextUnit(): Promise<[string, string]> {
+        await ensureNoBlockingDialogs(this.page);
         const currentName = (await this.activeUnit.innerText().catch(() => '')) || '';
         if (await this.unitNavNextBtn.isVisible().catch(() => false)) {
             await this.unitNavNextBtn.click();
@@ -143,18 +210,21 @@ export class CourseDetailPage {
             await this.sidebarUnits.nth(1).click();
         }
         await this.page.waitForTimeout(1_000);
+        await dismissBlockingWebsiteDialogs(this.page);
         const newName = (await this.activeUnit.innerText().catch(() => '')) || '';
         return [currentName, newName];
     }
 
     /** 点击上一节 */
     async clickPrevUnit() {
+        await ensureNoBlockingDialogs(this.page);
         if (await this.unitNavPrevBtn.isVisible().catch(() => false)) {
             await this.unitNavPrevBtn.click();
         } else {
             await this.sidebarUnits.first().click();
         }
         await this.page.waitForTimeout(1_000);
+        await dismissBlockingWebsiteDialogs(this.page);
     }
 
     /** 获取当前可用小节总数 */

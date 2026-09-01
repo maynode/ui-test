@@ -68,21 +68,66 @@ export async function ensureWebsiteLoggedIn(page: Page, role: AccountRole = 'use
     if (isOnWebsiteHost(page)) {
         const currentAuthState = await waitForWebsiteAuthSettled(page);
         if (currentAuthState === 'logged-in') {
-            await assertWebsiteLoggedIn(page);
-            await dismissBlockingWebsiteDialogs(page);
-            return;
+            try {
+                await assertWebsiteLoggedIn(page);
+                await dismissBlockingWebsiteDialogs(page);
+                return;
+            } catch {
+                // 顶栏头像可见但 cookie 半失效，继续走完整登录
+            }
         }
     }
 
     await page.goto('.', { waitUntil: 'domcontentloaded' });
+    await loginWebsiteWithRetry(page, role, baseURL);
+}
 
+async function loginWebsiteWithRetry(page: Page, role: AccountRole, baseURL: string): Promise<void> {
     const authState = await waitForWebsiteAuthSettled(page);
     if (authState === 'logged-out') {
         await loginAs(page, baseURL, role);
     }
 
+    try {
+        await assertWebsiteLoggedIn(page);
+    } catch {
+        await loginAs(page, baseURL, role);
+        await assertWebsiteLoggedIn(page);
+    }
+
+    await dismissBlockingWebsiteDialogs(page);
+}
+
+/**
+ * 顶栏仍显示「注册/登录」时强制 OAuth 重登（storageState 过期场景）。
+ * @returns 是否执行了重登
+ */
+export async function reloginWebsiteIfNeeded(page: Page, role: AccountRole = 'user'): Promise<boolean> {
+    const loginBtn = page.getByRole('button', { name: LOGIN_BUTTON });
+    const headerAvatar = page.locator('header .zw-vip-avatar, header [class*="ZwVipAvatar"], header .zw-header-avatar, header [class*="ZwHeaderAvatar"]').first();
+
+    const needsRelogin = await expect
+        .poll(
+            async () => {
+                if (await headerAvatar.isVisible().catch(() => false)) return false;
+                return await loginBtn.isVisible().catch(() => false);
+            },
+            { timeout: 10_000, intervals: [300, 500, 1000] },
+        )
+        .toBe(true)
+        .then(() => true)
+        .catch(() => false);
+
+    if (!needsRelogin) {
+        return false;
+    }
+
+    const baseURL = websiteBaseURL();
+    await page.goto('.', { waitUntil: 'domcontentloaded' });
+    await loginAs(page, baseURL, role);
     await assertWebsiteLoggedIn(page);
     await dismissBlockingWebsiteDialogs(page);
+    return true;
 }
 
 /** 断言当前页顶栏已是登录态（无「注册/登录」）。须在业务页操作前调用。 */

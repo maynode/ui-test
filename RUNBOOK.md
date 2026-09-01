@@ -48,7 +48,7 @@ pnpm run test:tc-admin:seed:tcTest
 
 若这一步失败，先不要跑 Smoke。
 
-## 4. 跑主流程验收（推荐 · 产品清单 20 项）
+## 4. 跑主流程验收（推荐 · 产品清单 24 项）
 
 ```powershell
 pnpm run test:main-flow:tcTest
@@ -56,7 +56,7 @@ pnpm run test:main-flow:tcTest
 
 范围：
 - 只跑 `TC-MainFlow` 项目（`tests/main-flow/`）
-- 只跑 `@MainFlow`，不含 `@Destructive`
+- 只跑 `@MainFlow`，不含 `@Destructive`（22 条非破坏性核心用例）
 - 对照表：[`tests/MAIN-FLOW-MATRIX.md`](tests/MAIN-FLOW-MATRIX.md)
 
 破坏性主流程（交卷等，2 条）：
